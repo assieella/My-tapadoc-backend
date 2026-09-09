@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAPA CONSEIL — Accueil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0A1B3D;
+  --gold:#C9A227;
+  --paper:#F7F4EC;
+  --paper-line:#DCD5C2;
+  --ink:#241F14;
+  --ink-soft:#6b6455;
+  --white:#ffffff;
+  --radius:2px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:15px;line-height:1.55;}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;margin:0;}
+.btn{border:1px solid var(--navy);background:var(--white);color:var(--navy);padding:12px 22px;font-size:13.5px;font-weight:600;letter-spacing:.3px;border-radius:var(--radius);cursor:pointer;text-decoration:none;display:inline-block;}
+.btn:hover{background:var(--navy);color:var(--white);}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:var(--navy);}
+.btn.gold:hover{background:#b6911f;}
+
+.landing-nav{display:flex;align-items:center;justify-content:space-between;padding:22px 5%;border-bottom:1px solid var(--paper-line);}
+.landing-nav .mark{font-family:'Fraunces',serif;font-weight:700;font-size:19px;color:var(--navy);display:flex;align-items:center;gap:10px;}
+.landing-nav .mark span{color:var(--gold);}
+.brand-logo{height:34px;width:auto;display:block;}
+.brand-logo.hidden{display:none;}
+.navlinks{display:flex;gap:24px;align-items:center;}
+.landing-nav a{color:var(--navy);font-size:13.5px;font-weight:600;text-decoration:none;cursor:pointer;}
+.navmenu-link{padding:7px 4px;border-bottom:2px solid transparent;}
+.navmenu-link.active{color:var(--gold);border-bottom-color:var(--gold);}
+.navmenu-link:hover{color:var(--gold);}
+
+.hero{padding:80px 5% 60px;text-align:center;max-width:760px;margin:0 auto;}
+.hero .eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:700;}
+.hero h1{font-size:38px;line-height:1.15;margin:14px 0 18px;color:var(--navy);}
+.hero p{font-size:16px;color:var(--ink-soft);max-width:560px;margin:0 auto;line-height:1.6;}
+
+.products{max-width:1300px;margin:0 auto;padding:20px 5% 80px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;}
+.product-card{background:var(--white);border:1px solid var(--paper-line);border-radius:var(--radius);padding:36px 32px;display:flex;flex-direction:column;gap:14px;}
+.product-card .tag{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);font-weight:700;}
+.product-card h2{font-size:23px;color:var(--navy);}
+.product-card p{color:var(--ink-soft);font-size:14px;line-height:1.6;flex:1;}
+.product-card .price{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:var(--navy);}
+.product-card .price-label{font-size:11.5px;color:var(--ink-soft);margin-bottom:10px;}
+.product-card .price-message{font-family:'Fraunces',serif;font-weight:600;font-size:16px;color:var(--navy);margin-bottom:6px;line-height:1.35;}
+.product-card .price-from{font-size:12px;color:var(--ink-soft);margin-bottom:16px;}
+.product-card ul{list-style:none;padding:0;margin:0 0 6px;font-size:13px;color:var(--ink);}
+.product-card li{padding:5px 0;border-bottom:1px solid var(--paper-line);display:flex;gap:8px;}
+.product-card li:before{content:"✓";color:#2F6844;font-weight:700;}
+
+.foot{text-align:center;padding:40px 5% 50px;color:var(--ink-soft);font-size:12px;border-top:1px solid var(--paper-line);}
+@media (max-width:1000px){
+  .products{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:760px){
+  .products{grid-template-columns:1fr;}
+  .hero h1{font-size:28px;}
+}
+.verify-ok{background:#e7f0e9;border:1px solid var(--green);border-radius:10px;padding:16px 20px;font-size:14px;color:var(--ink);}
+.verify-err{background:#f6e8e6;border:1px solid #A8362B;border-radius:10px;padding:16px 20px;font-size:14px;color:var(--ink);}
+.verify-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+.verify-links .btn{text-decoration:none;font-size:13px;padding:9px 16px;}
+</style>
+</head>
+<body>
+
+<div class="landing-nav">
+  <div class="mark"><img src="logo.png" alt="" class="brand-logo" onerror="this.classList.add('hidden')">TAPA <span>DOC</span></div>
+  <div class="navlinks">
+    <a href="Accueil-TAPA-CONSEIL.html" class="navmenu-link active">Accueil</a>
+    <a href="Etablir-Business-Plan.html" class="navmenu-link">Business Plan</a>
+    <a href="TAPA-FinModel.html" class="navmenu-link">TAPA FinModel</a>
+    <a href="TAPA-Procedures.html" class="navmenu-link">TAPA Procédures</a>
+    <a href="Guide-Pratique-TAPA-CONSEIL.html" class="navmenu-link">Guide pratique</a>
+  </div>
+</div>
+
+<div id="verifyBanner" class="hidden" style="max-width:760px;margin:24px auto 0;padding:0 5%;"></div>
+
+<div class="hero">
+  <div class="eyebrow">TAPA FinModel</div>
+  <h1>Créez vos documents financiers en quelques minutes</h1>
+  <p>Trois outils pour préparer sereinement votre dossier auprès d'une banque ou d'un partenaire — choisissez celui qui correspond à votre besoin.</p>
+</div>
+
+<div class="products">
+  <div class="product-card">
+    <div class="tag">Étape par étape</div>
+    <h2>TAPA FinModel</h2>
+    <p>Compte de résultat, bilan, trésorerie, plan de financement, seuil de rentabilité et ratios — construits automatiquement à partir de questions simples. Idéal pour préparer un dossier de crédit précis.</p>
+    <ul>
+      <li>Compte de résultat 12 mois gratuit</li>
+      <li>Bilan et ratios auto-générés</li>
+      <li>Export PDF et Excel</li>
+    </ul>
+    <div class="price-message">Vous ne payez que ce qui correspond à votre projet</div>
+    <div class="price-from">À partir de 15 000 FCFA</div>
+    <a class="btn gold" href="TAPA-FinModel.html">Établir mon TAPA FinModel →</a>
+  </div>
+
+  <div class="product-card">
+    <div class="tag">Vue d'ensemble</div>
+    <h2>Votre Business Plan</h2>
+    <p>La même mécanique financière, enrichie d'une classification automatique de votre projet, de trois scénarios (Prudent/Réaliste/Ambitieux) et d'un diagnostic de finançabilité noté sur 100.</p>
+    <ul>
+      <li>Classification Petit / Moyen / Gros projet</li>
+      <li>3 scénarios recalculés automatiquement</li>
+      <li>Diagnostic de finançabilité avec alertes</li>
+    </ul>
+    <div class="price-message">Vous ne payez que ce qui correspond à votre projet</div>
+    <div class="price-from">À partir de 15 000 FCFA</div>
+    <a class="btn gold" href="Etablir-Business-Plan.html">Établir mon Business Plan →</a>
+  </div>
+
+  <div class="product-card">
+    <div class="tag">Document rédigé</div>
+    <h2>TAPA Procédures</h2>
+    <p>Votre manuel de procédures pour structurer la gestion quotidienne de votre entreprise — administratif/financier ou comptable, utile aussi pour un dossier de crédit. Rédigé par IA à partir d'un questionnaire simple, dans une structure professionnelle éprouvée.</p>
+    <ul>
+      <li>2 manuels : PME ou Comptable</li>
+      <li>Génération immédiate, section par section</li>
+      <li>Formule "Validé par un expert" disponible</li>
+    </ul>
+    <div class="price-message">Vous ne payez que ce qui correspond à la taille de votre entreprise</div>
+    <div class="price-from">À partir de 25 000 FCFA</div>
+    <a class="btn gold" href="TAPA-Procedures.html">Générer mon manuel →</a>
+  </div>
+</div>
+
+<div class="foot">TAPA CONSEIL · "L'Intelligence Financière Pour Tous" · WhatsApp <a href="https://wa.me/2250504775774" target="_blank" style="color:var(--navy);">+225 05 04 77 57 74</a> · formationella398@gmail.com</div>
+
+<!-- TAPA DOC Assistant — bulle flottante + panneau de conversation -->
+<style>
+#tda-bubble{position:fixed;bottom:24px;right:24px;width:60px;height:60px;border-radius:50%;background:var(--navy);color:#fff;border:none;box-shadow:0 6px 18px rgba(10,27,61,.35);cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;z-index:9999;transition:transform .15s;}
+#tda-bubble:hover{transform:scale(1.06);}
+#tda-panel{position:fixed;bottom:24px;right:24px;width:360px;max-width:92vw;height:520px;max-height:80vh;background:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(10,27,61,.28);display:none;flex-direction:column;overflow:hidden;z-index:9999;font-family:'IBM Plex Sans',sans-serif;}
+#tda-panel.open{display:flex;}
+#tda-header{background:var(--navy);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;font-family:'Fraunces',serif;font-weight:600;font-size:15px;}
+#tda-header .sub{font-family:'IBM Plex Sans',sans-serif;font-weight:400;font-size:11.5px;color:#e8e4d8;margin-top:2px;}
+#tda-close{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;padding:2px 6px;}
+#tda-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--paper);}
+.tda-msg{max-width:85%;padding:9px 12px;border-radius:12px;font-size:13.5px;line-height:1.45;white-space:pre-wrap;}
+.tda-msg.assistant{background:#fff;border:1px solid var(--paper-line);align-self:flex-start;border-bottom-left-radius:3px;}
+.tda-msg.user{background:var(--navy);color:#fff;align-self:flex-end;border-bottom-right-radius:3px;}
+.tda-buttons{display:flex;flex-direction:column;gap:6px;align-self:flex-start;max-width:90%;}
+.tda-btn{background:#fff;border:1px solid var(--gold);color:var(--navy);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;}
+.tda-btn:hover{background:#fdf8ec;}
+#tda-inputrow{border-top:1px solid var(--paper-line);padding:10px;display:flex;gap:8px;background:#fff;}
+#tda-input{flex:1;border:1px solid var(--paper-line);border-radius:20px;padding:9px 14px;font-size:13.5px;font-family:inherit;}
+#tda-input:focus{outline:2px solid var(--gold);outline-offset:0;}
+#tda-send{background:var(--gold);border:none;color:var(--navy);border-radius:50%;width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;}
+#tda-send:disabled{opacity:.5;cursor:not-allowed;}
+.tda-typing{align-self:flex-start;color:var(--ink-soft);font-size:12.5px;padding:0 4px;}
+.tda-limit-box{background:#fdf8ec;border:1px solid var(--gold);border-radius:10px;padding:12px;font-size:13px;color:var(--ink);margin-top:4px;}
+.tda-limit-box a,.tda-limit-box button{display:block;margin-top:8px;text-align:center;}
+</style>
+
+<button id="tda-bubble" aria-label="Ouvrir l'assistant TAPA DOC">💬</button>
+<div id="tda-panel">
+  <div id="tda-header">
+    <div><div>TAPA DOC Assistant</div><div class="sub">Je vous aide à choisir le bon outil</div></div>
+    <button id="tda-close" aria-label="Fermer">✕</button>
+  </div>
+  <div id="tda-messages"></div>
+  <div id="tda-inputrow">
+    <input id="tda-input" type="text" placeholder="Écrivez votre besoin..." maxlength="600">
+    <button id="tda-send">➤</button>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+const API_BASE = ''; // même origine
+
+function getVisitorId(){
+  let id = localStorage.getItem('tapadoc_visitor_id');
+  if(!id){
+    id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('v-'+Date.now()+'-'+Math.random().toString(36).slice(2));
+    localStorage.setItem('tapadoc_visitor_id', id);
+  }
+  return id;
+}
+const visitorId = getVisitorId();
+
+const bubble = document.getElementById('tda-bubble');
+const panel = document.getElementById('tda-panel');
+const closeBtn = document.getElementById('tda-close');
+const messagesEl = document.getElementById('tda-messages');
+const inputEl = document.getElementById('tda-input');
+const sendBtn = document.getElementById('tda-send');
+
+let opened = false;
+let limitReached = false;
+let limit = 8;
+
+function addMessage(role, text){
+  const div = document.createElement('div');
+  div.className = 'tda-msg '+role;
+  div.textContent = text;
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+function addButtons(labels, onClick){
+  const wrap = document.createElement('div');
+  wrap.className = 'tda-buttons';
+  labels.forEach(label=>{
+    const btn = document.createElement('button');
+    btn.className = 'tda-btn';
+    btn.textContent = label;
+    btn.addEventListener('click', ()=>onClick(label));
+    wrap.appendChild(btn);
+  });
+  messagesEl.appendChild(wrap);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+function showTyping(){
+  const div = document.createElement('div');
+  div.className = 'tda-typing';
+  div.id = 'tda-typing-indicator';
+  div.textContent = "L'assistant écrit…";
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+function hideTyping(){
+  const el = document.getElementById('tda-typing-indicator');
+  if(el) el.remove();
+}
+function showLimitReached(){
+  limitReached = true;
+  inputEl.disabled = true; sendBtn.disabled = true;
+  inputEl.placeholder = 'Limite de messages atteinte';
+  const box = document.createElement('div');
+  box.className = 'tda-limit-box';
+  box.innerHTML = `On a bien avancé sur votre besoin. Pour aller plus loin, le plus simple est de créer un compte gratuit.
+    <a href="TAPA-FinModel.html" style="text-decoration:none;background:var(--gold);color:var(--navy);padding:9px;border-radius:8px;font-weight:600;font-size:13px;">Créer mon compte</a>
+    <a href="https://wa.me/2250504775774" target="_blank" style="text-decoration:none;border:1px solid var(--navy);color:var(--navy);padding:9px;border-radius:8px;font-weight:600;font-size:13px;">Parler à TAPA CONSEIL</a>`;
+  messagesEl.appendChild(box);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function showIntro(){
+  addMessage('assistant', "👋 Bonjour, je suis l'assistant TAPA DOC. Je peux vous aider à préparer vos documents financiers, votre Business Plan ou votre manuel de procédures. Que souhaitez-vous faire ?");
+  addButtons(['📊 Préparer mon Business Plan','💰 Construire mes documents financiers','📑 Créer mon manuel de procédures','💬 Autre chose / je ne sais pas encore'], (label)=>sendMessage(label));
+}
+
+async function loadConversation(){
+  try{
+    const res = await fetch(API_BASE+'/api/assistant/conversation/'+visitorId);
+    const data = await res.json();
+    limit = data.limit || 8;
+    if(data.messages && data.messages.length){
+      data.messages.forEach(m=>addMessage(m.role, m.content));
+      if(data.limitReached) showLimitReached();
+    } else {
+      showIntro();
+    }
+  }catch(e){
+    showIntro();
+  }
+}
+
+async function sendMessage(text){
+  if(!text || !text.trim() || limitReached) return;
+  addMessage('user', text.trim());
+  inputEl.value='';
+  inputEl.disabled = true; sendBtn.disabled = true;
+  showTyping();
+  try{
+    const res = await fetch(API_BASE+'/api/assistant/message', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ visitorId, message: text.trim() })
+    });
+    const data = await res.json();
+    hideTyping();
+    if(!res.ok){
+      if(data.limitReached){ showLimitReached(); return; }
+      addMessage('assistant', data.error || "Je n'ai pas pu répondre, réessayez dans un instant.");
+      return;
+    }
+    addMessage('assistant', data.reply);
+    if(data.boutons && data.boutons.length) addButtons(data.boutons, (label)=>sendMessage(label));
+    if(data.limitReached) showLimitReached();
+  }catch(e){
+    hideTyping();
+    addMessage('assistant', "Je n'ai pas pu répondre, réessayez dans un instant.");
+  }finally{
+    if(!limitReached){ inputEl.disabled = false; sendBtn.disabled = false; inputEl.focus(); }
+  }
+}
+
+function ouvrirAssistant(){
+  panel.classList.add('open');
+  if(!opened){ opened = true; loadConversation(); }
+}
+
+bubble.addEventListener('click', ()=>{
+  if(panel.classList.contains('open')){ panel.classList.remove('open'); return; }
+  ouvrirAssistant();
+});
+// Ouverture automatique après 1 minute sur la page, si le visiteur n'a pas déjà interagi.
+setTimeout(()=>{ if(!opened) ouvrirAssistant(); }, 60000);
+closeBtn.addEventListener('click', ()=>panel.classList.remove('open'));
+sendBtn.addEventListener('click', ()=>sendMessage(inputEl.value));
+inputEl.addEventListener('keydown', e=>{ if(e.key==='Enter') sendMessage(inputEl.value); });
+
+// Confirmation d'email : la page d'Accueil est la cible du lien envoyé par email (FRONTEND_URL),
+// donc c'est elle qui doit finaliser la vérification, même si elle n'a pas de compte/connexion
+// complète comme les 3 outils.
+(async function handleEmailVerify(){
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('verify');
+  if(!token) return;
+  history.replaceState(null,'',window.location.pathname);
+  const banner = document.getElementById('verifyBanner');
+  banner.classList.remove('hidden');
+  try{
+    const res = await fetch('/api/auth/verify-email', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({token})});
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error||'Lien invalide ou expiré.');
+    try{ localStorage.setItem('precred_token', data.token); }catch(e){}
+    banner.innerHTML = `<div class="verify-ok">✅ Votre compte est confirmé ! Choisissez un outil pour commencer :
+      <div class="verify-links">
+        <a href="TAPA-FinModel.html" class="btn gold">TAPA FinModel</a>
+        <a href="Etablir-Business-Plan.html" class="btn gold">Business Plan</a>
+        <a href="TAPA-Procedures.html" class="btn gold">TAPA Procédures</a>
+      </div></div>`;
+  }catch(err){
+    banner.innerHTML = `<div class="verify-err">⚠️ ${err.message} — vous pouvez redemander un nouvel email de confirmation depuis la page de connexion de n'importe quel outil.</div>`;
+  }
+})();
+})();
+</script>
+
+</body>
+</html>

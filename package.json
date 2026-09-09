@@ -1,0 +1,22 @@
+{
+  "name": "precred-backend",
+  "version": "1.3.0",
+  "description": "Backend Node.js pour TAPA CONSEIL — sert Atelier PRE-CRED, Établir votre Business Plan et TAPA Procédures (comptes, paiement Paiement Pro, sauvegarde du dossier, génération de manuels via l'API Claude)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.3.0",
+    "cors": "^2.8.5",
+    "docx": "^9.0.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.0",
+    "node-fetch": "^2.7.0"
+  }
+}

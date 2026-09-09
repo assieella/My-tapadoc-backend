@@ -1,0 +1,2892 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAPA FinModel — TAPA CONSEIL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0A1B3D;
+  --navy-light:#132a56;
+  --gold:#C9A227;
+  --gold-soft:#e6d8a8;
+  --paper:#F7F4EC;
+  --paper-line:#DCD5C2;
+  --ink:#241F14;
+  --ink-soft:#6b6455;
+  --green:#2F6844;
+  --green-bg:#e7f0e9;
+  --red:#A8362B;
+  --red-bg:#f6e8e6;
+  --white:#ffffff;
+  --radius:2px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'IBM Plex Sans',sans-serif;
+  font-size:15.5px;
+  line-height:1.55;
+}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;margin:0;}
+.num, input[type=number], td.num-cell, .figure{font-family:'IBM Plex Mono',monospace; font-variant-numeric: tabular-nums;}
+.month-input{width:100%;border:1px solid transparent;background:transparent;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;text-align:right;padding:4px 6px;border-radius:3px;color:var(--ink);}
+.month-input:hover{border-color:var(--paper-line);background:var(--paper);}
+.month-input:focus{border-color:var(--gold);background:var(--white);outline:none;}
+.month-input.overridden{background:#fdf3d8;color:var(--navy);font-weight:600;}
+.row-reset{background:none;border:none;color:var(--gold);cursor:pointer;font-size:12px;margin-left:4px;padding:0 2px;vertical-align:middle;}
+.row-reset:hover{color:var(--navy);}
+button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;}
+#app{display:flex;min-height:100vh;}
+
+/* SIDEBAR — dossier tabs */
+.sidebar{
+  width:230px;flex-shrink:0;background:var(--navy);color:var(--white);
+  display:flex;flex-direction:column;padding:28px 0 20px;
+}
+.brand{padding:0 22px 22px;border-bottom:1px solid rgba(201,162,39,.35);margin-bottom:6px;}
+.brand .mark{font-family:'Fraunces',serif;font-size:20px;font-weight:700;letter-spacing:.3px;display:flex;align-items:center;gap:9px;}
+.brand .mark span{color:var(--gold);}
+.brand .sub{font-size:10.5px;letter-spacing:1.6px;text-transform:uppercase;color:#9fb0d0;margin-top:4px;}
+nav.tabs{flex:1;padding-top:6px;}
+.tab{
+  display:flex;align-items:center;gap:12px;padding:13px 22px;cursor:pointer;
+  border-left:3px solid transparent;color:#c3cde3;position:relative;
+}
+.tab:hover{background:rgba(255,255,255,.04);}
+.tab.active{border-left-color:var(--gold);background:rgba(255,255,255,.06);color:var(--white);}
+.tab .roman{font-family:'Fraunces',serif;font-size:14.5px;color:var(--gold);width:22px;flex-shrink:0;}
+.tab .label{font-size:14.5px;letter-spacing:.2px;}
+.tab .seal{
+  margin-left:auto;width:16px;height:16px;border-radius:50%;border:1.5px solid #4a5a80;
+  display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;flex-shrink:0;
+}
+.tab.done .seal{border-color:var(--gold);color:var(--navy);background:var(--gold);}
+.tab.locked{opacity:.55;}
+.tab.locked .label{font-style:italic;}
+.tab.locked .seal{font-size:11px;}
+.sidebar-foot{padding:16px 22px 0;border-top:1px solid rgba(201,162,39,.35);margin-top:6px;}
+.sidebar-foot a{color:var(--gold-soft);font-size:12.5px;text-decoration:none;display:block;margin-top:6px;}
+.sidebar-foot a:hover{text-decoration:underline;}
+
+/* MAIN */
+.content{flex:1;display:flex;flex-direction:column;min-width:0;}
+.topbar{
+  background:var(--white);border-bottom:1px solid var(--paper-line);
+  padding:16px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.ctx{font-size:14.5px;color:var(--ink-soft);}
+.save-indicator{font-size:12px;font-weight:600;transition:opacity .4s;white-space:nowrap;}
+.scenario-switch{display:flex;border:1px solid var(--paper-line);border-radius:20px;overflow:hidden;}
+.scenario-switch button{border:none;background:var(--white);color:var(--ink-soft);padding:6px 13px;font-size:11.5px;font-weight:600;cursor:pointer;}
+.scenario-switch button.active{background:var(--navy);color:var(--white);}
+.scenario-switch button:hover:not(.active){background:var(--paper);}
+.save-indicator.saving{color:var(--ink-soft);}
+.save-indicator.saved{color:var(--green);}
+.save-indicator.error{color:var(--red);}
+.progress-row{display:flex;align-items:center;gap:14px;padding:10px 32px;background:var(--white);border-bottom:1px solid var(--paper-line);}
+.progress-track{flex:1;height:6px;background:var(--paper);border-radius:6px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(to right,var(--gold),var(--navy));border-radius:6px;transition:width .4s;width:0%;}
+.progress-label{font-size:11.5px;color:var(--ink-soft);font-weight:600;white-space:nowrap;}
+.welcome-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--navy);color:var(--white);padding:13px 22px;border-radius:var(--radius);font-size:13.5px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.25);border-left:3px solid var(--gold);z-index:999;opacity:0;pointer-events:none;transition:opacity .3s, transform .3s;}
+.welcome-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.ctx b{color:var(--ink);font-weight:600;}
+.exports{display:flex;gap:10px;}
+.btn{
+  border:1px solid var(--navy);background:var(--white);color:var(--navy);
+  padding:9px 16px;font-size:13.5px;font-weight:600;letter-spacing:.3px;border-radius:var(--radius);
+}
+.btn:hover{background:var(--navy);color:var(--white);}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:var(--navy);}
+.btn.gold:hover{background:#b6911f;}
+.btn.ghost{border-color:var(--paper-line);color:var(--ink-soft);}
+
+.view{display:none;padding:32px 40px 60px;max-width:1100px;}
+.view.active{display:block;}
+.view-head{margin-bottom:6px;}
+.view-head .eyebrow{font-size:12px;letter-spacing:1.8px;text-transform:uppercase;color:var(--gold);font-weight:600;}
+.view-head h2{font-size:28px;margin-top:4px;}
+.view-desc{color:var(--ink-soft);font-size:14.5px;margin-top:8px;max-width:640px;}
+.hr{height:1px;background:linear-gradient(to right, var(--gold), var(--paper-line) 40%);margin:20px 0 26px;}
+
+.card{background:var(--white);border:1px solid var(--paper-line);border-radius:var(--radius);padding:22px 24px;margin-bottom:20px;}
+.card h3{font-size:16.5px;margin-bottom:14px;color:var(--navy);}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 24px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:13px;color:var(--ink-soft);font-weight:500;}
+.field input, .field select{
+  border:1px solid var(--paper-line);background:var(--paper);padding:10px 11px;font-size:14.5px;
+  border-radius:var(--radius);color:var(--ink);
+}
+.field input:focus, .field select:focus, td input:focus{outline:2px solid var(--gold);outline-offset:0;background:var(--white);}
+
+table.ledger{width:100%;border-collapse:collapse;font-size:13.5px;}
+table.ledger th, table.ledger td{border-bottom:1px solid var(--paper-line);padding:9px 9px;text-align:right;white-space:nowrap;}
+table.ledger th{color:var(--ink-soft);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.4px;}
+table.ledger td:first-child, table.ledger th:first-child{text-align:left;white-space:normal;min-width:190px;position:sticky;left:0;background:var(--white);}
+table.ledger tbody tr:hover td{background:#fbfaf6;}
+table.ledger td:first-child{font-weight:500;}
+table.ledger input{
+  width:118px;border:1px solid transparent;background:transparent;text-align:right;padding:5px;font-size:13.5px;
+  font-family:'IBM Plex Mono',monospace;color:var(--ink);border-radius:var(--radius);
+}
+table.ledger input:hover{border-color:var(--paper-line);}
+table.ledger .growth{width:52px;}
+.row-section{background:var(--paper) !important;}
+.row-section td{font-weight:700;color:var(--navy);}
+tr.total td{font-weight:700;border-top:1.5px solid var(--navy);border-bottom:none;color:var(--navy);}
+tr.total.result td{color:var(--gold);border-top:2px solid var(--navy);}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--paper-line);border-radius:var(--radius);}
+.neg{color:var(--red);}
+.pos{color:var(--green);}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.kpi{background:var(--white);border:1px solid var(--paper-line);padding:18px 18px;border-radius:var(--radius);}
+.kpi .l{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-soft);margin-bottom:8px;}
+.kpi .v{font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:600;color:var(--navy);}
+.kpi.warn{border-color:var(--red);}
+.kpi.ok{border-color:var(--green);}
+
+.status-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--radius);font-size:14px;font-weight:500;margin-bottom:18px;}
+.diag-header{display:flex;align-items:center;gap:20px;margin-bottom:18px;}
+.diag-score{flex-shrink:0;width:76px;height:76px;border-radius:50%;border:4px solid;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:700;}
+.diag-label{font-family:'Fraunces',serif;font-size:19px;font-weight:600;}
+.diag-alerts{display:flex;flex-direction:column;gap:0;}
+.diag-alerts .status-bar{margin-bottom:10px;}
+.status-bar.ok{background:var(--green-bg);color:var(--green);}
+.status-bar.warn{background:var(--red-bg);color:var(--red);}
+
+.premium{
+  margin-top:30px;border:1px solid var(--gold);background:linear-gradient(135deg,#fffdf6, #fbf5e3);
+  border-radius:var(--radius);padding:26px 28px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;
+}
+.premium h3{color:var(--navy);font-size:18px;margin-bottom:6px;}
+.premium p{font-size:14px;color:var(--ink-soft);max-width:480px;margin:0;}
+.premium .actions{display:flex;gap:10px;flex-shrink:0;}
+
+.soon{background:var(--white);border:1px dashed var(--paper-line);border-radius:var(--radius);padding:16px 18px;font-size:14px;color:var(--ink-soft);display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:12px;}
+.soon .tag{font-size:10px;letter-spacing:1px;text-transform:uppercase;background:var(--paper);border:1px solid var(--paper-line);padding:4px 8px;border-radius:20px;color:var(--ink-soft);}
+
+.note{font-size:12.5px;color:var(--ink-soft);margin-top:10px;line-height:1.6;}
+
+/* MODULE CONVERSATIONNEL — ventes / charges dynamiques */
+.parlons-card{background:var(--white);border:1px solid var(--paper-line);border-radius:var(--radius);padding:24px 26px;margin-bottom:20px;}
+.parlons-card h3{font-size:18px;color:var(--navy);margin-bottom:4px;}
+.parlons-card .parlons-sub{font-size:13px;color:var(--ink-soft);margin-bottom:18px;}
+.lignes-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.ligne-row{display:flex;align-items:flex-end;gap:12px;padding:12px 14px;background:var(--paper);border:1px solid var(--paper-line);border-radius:var(--radius);}
+.ligne-label{flex:1 1 220px;min-width:140px;border:1px solid transparent;background:transparent;font-size:14px;font-weight:600;color:var(--ink);padding:8px 8px;border-radius:var(--radius);}
+.ligne-label:hover, .ligne-label:focus{border-color:var(--paper-line);background:var(--white);outline:none;}
+.ligne-amounts{display:flex;gap:10px;flex-shrink:0;}
+.ligne-field{display:flex;flex-direction:column;gap:3px;}
+.ligne-field label{font-size:10.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.3px;}
+.ligne-field input{width:118px;border:1px solid var(--paper-line);background:var(--white);padding:7px 8px;font-size:13.5px;border-radius:var(--radius);font-family:'IBM Plex Mono',monospace;}
+.ligne-del{flex-shrink:0;width:30px;height:30px;border-radius:50%;border:1px solid var(--paper-line);background:var(--white);color:var(--red);font-size:14px;line-height:1;cursor:pointer;}
+.ligne-del:hover{background:var(--red-bg);border-color:var(--red);}
+.ligne-empty{font-size:13px;color:var(--ink-soft);font-style:italic;padding:8px 2px;}
+.catalogue-label{font-size:12px;color:var(--ink-soft);margin:4px 0 10px;}
+.catalogue-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.chip{border:1px dashed var(--paper-line);background:var(--white);color:var(--navy);font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:20px;cursor:pointer;}
+.chip:hover{border-color:var(--gold);background:#fffdf6;}
+.chip:before{content:"+ ";color:var(--gold);}
+.add-custom-row{display:flex;gap:10px;align-items:center;}
+.add-custom-row input{flex:1;border:1px solid var(--paper-line);background:var(--paper);padding:9px 11px;font-size:13.5px;border-radius:var(--radius);}
+.add-custom-row button{flex-shrink:0;}
+@media (max-width:700px){
+  .ligne-row{flex-wrap:wrap;}
+  .ligne-amounts{width:100%;}
+  .ligne-field input{width:100%;}
+}
+.step-nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 40px;border-top:1px solid var(--paper-line);background:var(--white);}
+.step-nav-label{font-size:12px;color:var(--ink-soft);font-weight:600;letter-spacing:.3px;}
+.step-nav button:disabled{opacity:.4;cursor:not-allowed;}
+.foot{padding:24px 40px 40px;color:var(--ink-soft);font-size:11.5px;border-top:1px solid var(--paper-line);}
+
+@media (max-width:900px){
+  #app{flex-direction:column;}
+  .sidebar{width:100%;flex-direction:row;overflow-x:auto;padding:14px 0;}
+  .brand{display:none;}
+  nav.tabs{display:flex;padding-top:0;}
+  .sidebar-foot{display:none;}
+  .view{padding:22px 18px 50px;}
+  .grid,.kpis{grid-template-columns:1fr 1fr;}
+}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+
+/* AUTH / PAYWALL SCREENS */
+.gate{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--navy);padding:24px;}
+.gate-box{background:var(--paper);border-radius:var(--radius);max-width:420px;width:100%;padding:36px 34px;box-shadow:0 20px 60px rgba(0,0,0,.35);}
+.gate-brand{text-align:center;margin-bottom:22px;}
+.gate-brand .mark{font-family:'Fraunces',serif;font-weight:700;font-size:21px;color:var(--navy);}
+.gate-brand .mark span{color:var(--gold);}
+.gate-brand .sub{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink-soft);margin-top:4px;}
+.gate-box h2{font-size:19px;margin-bottom:6px;}
+.gate-box .desc{font-size:13px;color:var(--ink-soft);margin-bottom:20px;}
+.gate-switch{display:flex;gap:0;margin-bottom:20px;border:1px solid var(--paper-line);border-radius:var(--radius);overflow:hidden;}
+.gate-switch button{flex:1;padding:10px;background:var(--white);border:none;font-size:12.5px;font-weight:600;color:var(--ink-soft);}
+.gate-switch button.active{background:var(--navy);color:var(--white);}
+.gate-box .field{margin-bottom:14px;}
+.gate-box .field input{width:100%;border:1px solid var(--paper-line);background:var(--white);padding:10px 11px;font-size:13.5px;border-radius:var(--radius);}
+.gate-err{background:var(--red-bg);color:var(--red);font-size:12.5px;padding:10px 12px;border-radius:var(--radius);margin-bottom:14px;display:none;}
+.gate-box .btn{width:100%;padding:11px;font-size:13px;}
+.gate-foot{text-align:center;margin-top:16px;font-size:12px;color:var(--ink-soft);}
+.gate-foot a{color:var(--navy);font-weight:600;cursor:pointer;text-decoration:underline;}
+.paywall-price{text-align:center;background:var(--white);border:1px solid var(--gold);border-radius:var(--radius);padding:22px;margin-bottom:20px;}
+.paywall-price .amount{font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:600;color:var(--navy);}
+.paywall-price .label{font-size:12px;color:var(--ink-soft);margin-top:4px;}
+.paywall-list{list-style:none;padding:0;margin:0 0 22px;font-size:13px;color:var(--ink);}
+.paywall-list li{padding:7px 0;border-bottom:1px solid var(--paper-line);display:flex;gap:8px;}
+.paywall-list li:before{content:"✓";color:var(--green);font-weight:700;}
+.gate-loading{text-align:center;color:var(--ink-soft);font-size:13.5px;}
+.pwd-field{position:relative;}
+.pwd-field input{padding-right:40px;}
+.pwd-toggle{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:6px;color:var(--ink-soft);display:flex;align-items:center;justify-content:center;border-radius:var(--radius);}
+.pwd-toggle:hover{color:var(--navy);}
+.pwd-toggle svg{width:18px;height:18px;}
+.pay-methods{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.pay-method{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;border:1.5px solid var(--paper-line);border-radius:var(--radius);background:var(--white);cursor:pointer;font-size:13px;font-weight:500;color:var(--ink);text-align:left;}
+.pay-method:hover{border-color:var(--gold);}
+.pay-method.selected{border-color:var(--gold);background:#fffdf6;box-shadow:0 0 0 1px var(--gold);}
+.pay-method .tag{font-size:9.5px;letter-spacing:.5px;text-transform:uppercase;background:var(--paper);border:1px solid var(--paper-line);padding:3px 7px;border-radius:20px;color:var(--ink-soft);}
+.pay-method.disabled{opacity:.5;cursor:not-allowed;}
+.phone-group{display:flex;gap:0;}
+.phone-group .phone-dial{display:flex;align-items:center;padding:0 10px;border:1px solid var(--paper-line);border-right:none;border-radius:var(--radius) 0 0 var(--radius);background:var(--paper);font-size:13px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;}
+.phone-group input{border-radius:0 var(--radius) var(--radius) 0;}
+.phone-hint{font-size:11px;color:var(--ink-soft);margin-top:4px;min-height:14px;}
+.phone-hint.invalid{color:var(--red);}
+.phone-hint.valid{color:var(--green);}
+.hidden{display:none !important;}
+
+/* LANDING PAGE */
+.landing{background:var(--paper);min-height:100vh;}
+.landing-nav{display:flex;align-items:center;justify-content:space-between;padding:22px 5%;border-bottom:1px solid var(--paper-line);}
+.landing-nav .mark{font-family:'Fraunces',serif;font-weight:700;font-size:19px;color:var(--navy);display:flex;align-items:center;gap:10px;}
+.landing-nav .mark span{color:var(--gold);}
+.brand-logo{height:34px;width:auto;display:block;}
+.brand-logo.hidden{display:none;}
+.landing-nav .navlinks{display:flex;gap:24px;align-items:center;}
+.landing-nav a{color:var(--navy);font-size:13.5px;font-weight:600;text-decoration:none;cursor:pointer;}
+.navmenu-link{padding:7px 4px;border-bottom:2px solid transparent;}
+.navmenu-link.active{color:var(--gold);border-bottom-color:var(--gold);}
+.navmenu-link:hover{color:var(--gold);}
+.landing-hero{padding:70px 5% 56px;text-align:center;max-width:780px;margin:0 auto;}
+.landing-hero .eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:700;}
+.landing-hero h1{font-size:40px;line-height:1.15;margin:14px 0 18px;color:var(--navy);}
+.landing-hero p{font-size:16px;color:var(--ink-soft);max-width:560px;margin:0 auto 30px;line-height:1.6;}
+.landing-hero .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.landing-hero .btn{padding:14px 26px;font-size:14px;}
+.landing-section{max-width:1060px;margin:0 auto;padding:56px 5%;}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:34px;border-bottom:1px solid var(--paper-line);padding-bottom:18px;flex-wrap:wrap;}
+.section-head .eyebrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:700;display:block;margin-bottom:8px;}
+.section-head h2{font-size:26px;color:var(--navy);margin:0;}
+.section-head .sub{color:var(--ink-soft);font-size:13.5px;max-width:340px;text-align:right;line-height:1.5;}
+
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;position:relative;}
+.step{background:transparent;padding:0 22px 0 0;position:relative;}
+.step:not(:last-child):after{content:"";position:absolute;top:22px;right:-12px;width:24px;height:1px;background:var(--paper-line);}
+.step .n{font-family:'Fraunces',serif;font-size:17px;color:var(--navy);font-weight:700;width:44px;height:44px;border-radius:50%;background:var(--white);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.step h3{font-size:15px;color:var(--navy);margin-bottom:8px;}
+.step p{font-size:13px;color:var(--ink-soft);line-height:1.55;}
+
+.modules{display:flex;flex-direction:column;gap:16px;}
+.module-featured{display:flex;gap:20px;align-items:center;background:linear-gradient(135deg,#fffdf6,#fbf5e3);border:1px solid var(--gold);border-radius:var(--radius);padding:26px 28px;}
+.module-featured .badge{flex-shrink:0;font-family:'Fraunces',serif;font-size:13px;font-weight:700;color:var(--navy);background:var(--gold);padding:8px 14px;border-radius:20px;white-space:nowrap;}
+.module-featured .tag{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);font-weight:700;}
+.module-featured h3{font-size:18px;color:var(--navy);margin:4px 0 8px;}
+.module-featured p{font-size:13.5px;color:var(--ink-soft);line-height:1.6;margin:0;}
+.modules-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+.module-card{background:var(--white);border:1px solid var(--paper-line);border-left:3px solid var(--navy);border-radius:var(--radius);padding:20px 22px;}
+.module-card .tag{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-soft);font-weight:700;}
+.module-card h3{font-size:15px;color:var(--navy);margin:6px 0 8px;}
+.module-card p{font-size:13px;color:var(--ink-soft);line-height:1.6;margin:0;}
+
+.landing-pricing{background:var(--navy);border-radius:var(--radius);padding:44px 5%;text-align:center;margin:0 5%;color:var(--white);}
+.landing-pricing h2{color:var(--white);font-size:24px;margin-bottom:10px;}
+.landing-pricing p{color:#c3cde3;font-size:14px;max-width:520px;margin:0 auto 26px;line-height:1.6;}
+.landing-pricing .amount{font-family:'IBM Plex Mono',monospace;font-size:32px;color:var(--gold);font-weight:600;margin-bottom:4px;}
+.landing-pricing .amount-label{font-size:12px;color:#9fb0d0;margin-bottom:24px;}
+.landing-foot{text-align:center;padding:40px 5% 50px;color:var(--ink-soft);font-size:12px;}
+@media (max-width:800px){
+  .steps{grid-template-columns:1fr;gap:24px;}
+  .step:after{display:none;}
+  .modules-grid{grid-template-columns:1fr;}
+  .module-featured{flex-direction:column;align-items:flex-start;}
+  .section-head{flex-direction:column;align-items:flex-start;}
+  .section-head .sub{text-align:left;max-width:none;}
+  .landing-hero h1{font-size:30px;}
+}
+</style>
+</head>
+<body>
+
+<div id="screen-landing" class="landing hidden">
+  <div class="landing-nav">
+    <div class="mark"><img src="logo.png" alt="" class="brand-logo" onerror="this.classList.add('hidden')">TAPA <span>DOC</span></div>
+    <div class="navlinks">
+      <a href="Accueil-TAPA-CONSEIL.html" class="navmenu-link">Accueil</a>
+      <a href="Etablir-Business-Plan.html" class="navmenu-link">Business Plan</a>
+      <a href="TAPA-FinModel.html" class="navmenu-link active">TAPA FinModel</a>
+      <a href="TAPA-Procedures.html" class="navmenu-link">TAPA Procédures</a>
+      <a href="Guide-Pratique-TAPA-CONSEIL.html" class="navmenu-link">Guide pratique</a>
+      <a id="navLogin">Se connecter</a>
+      <button class="btn gold" id="navStart">Créer mon dossier</button>
+    </div>
+  </div>
+
+  <div class="landing-hero">
+    <div class="eyebrow">TAPA FinModel</div>
+    <h1>Préparez votre dossier de demande de crédit en toute simplicité.</h1>
+    <p>Répondez à des questions simples sur votre activité. Construisez automatiquement votre compte de résultat, votre bilan, votre plan de trésorerie et votre plan de financement — les documents que votre banquier va vous demander.</p>
+    <div class="cta-row">
+      <button class="btn gold" id="heroStart">Commencer gratuitement</button>
+      <a class="btn ghost" id="heroLogin" style="display:inline-flex;align-items:center;text-decoration:none;">J'ai déjà un compte</a>
+    </div>
+  </div>
+
+  <div class="landing-section">
+    <div class="section-head">
+      <div><span class="eyebrow">Le parcours</span><h2>Comment ça marche</h2></div>
+      <div class="sub">Le premier module est gratuit. Vous ne payez que pour aller plus loin.</div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="n">I</div><h3>Créez votre compte</h3><p>Gratuit et immédiat — aucun paiement requis pour commencer.</p></div>
+      <div class="step"><div class="n">II</div><h3>Faites votre compte de résultat sur 12 mois</h3><p>Le premier module est gratuit : chiffre d'affaires, charges et résultat net, mois par mois. Remplissez-le et voyez le résultat tout de suite.</p></div>
+      <div class="step"><div class="n">III</div><h3>Débloquez la suite</h3><p>Convaincu ? Un paiement Mobile Money débloque le Compte de résultat 5 ans, le Bilan, la Trésorerie, le Plan de financement, et les exports PDF/Excel.</p></div>
+    </div>
+  </div>
+
+  <div class="landing-section">
+    <div class="section-head">
+      <div><span class="eyebrow">Votre dossier</span><h2>Ce que contient votre dossier</h2></div>
+      <div class="sub">Cinq documents attendus par toute banque, expliqués simplement.</div>
+    </div>
+    <div class="modules">
+      <div class="module-featured">
+        <div class="badge">Gratuit</div>
+        <div>
+          <div class="tag">Étape II</div>
+          <h3>Compte de résultat (12 mois)</h3>
+          <p>Votre rentabilité mois par mois sur votre première année : chiffre d'affaires, charges, résultat net. C'est le document que vous testez sans rien payer.</p>
+        </div>
+      </div>
+      <div class="modules-grid">
+        <div class="module-card"><div class="tag">Étape III</div><h3>Compte de résultat (5 ans)</h3><p>La même logique, projetée sur 5 ans à partir de votre Année 1. Il prouve que votre activité peut générer assez de bénéfices pour rembourser un crédit sur la durée.</p></div>
+        <div class="module-card"><div class="tag">Étape IV</div><h3>Bilan prévisionnel</h3><p>Construit automatiquement à partir de vos réponses précédentes — vous n'avez rien à remplir. Il montre le patrimoine de votre entreprise et sa solidité financière.</p></div>
+        <div class="module-card"><div class="tag">Étape V</div><h3>Plan de trésorerie (12 mois)</h3><p>Vos encaissements et décaissements mois par mois. Il révèle si votre entreprise aura assez de liquidités pour tenir — un document que tout banquier regarde de près.</p></div>
+        <div class="module-card"><div class="tag">Étape VI</div><h3>Plan de financement</h3><p>Démontre que vos besoins de démarrage (investissements, trésorerie de départ) sont couverts par des ressources identifiées, dont le crédit demandé.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="landing-pricing">
+    <h2>Un tarif simple, à l'usage</h2>
+    <p>Créez votre compte et testez gratuitement votre Compte de résultat sur 12 mois. Vous ne payez que si vous voulez aller plus loin : projection sur 5 ans, Bilan, Trésorerie, Plan de financement, et l'export PDF/Excel pour votre banque.</p>
+    <div class="amount" id="landing_amount">15 000 FCFA</div>
+    <div class="amount-label">pour débloquer votre premier dossier — 30 jours d'accès, en Mobile Money</div>
+    <button class="btn gold" id="pricingStart">Commencer gratuitement</button>
+  </div>
+
+  <div class="landing-foot">TAPA CONSEIL · "L'Intelligence Financière Pour Tous" · <a href="https://wa.me/2250504775774" target="_blank" style="color:var(--navy);">WhatsApp</a> · formationella398@gmail.com</div>
+</div>
+
+<div id="screen-auth" class="gate hidden">
+  <div class="gate-box">
+    <div class="gate-brand"><div class="mark">TAPA <span>CONSEIL</span></div><div class="sub">TAPA FinModel</div></div>
+    <div class="gate-switch">
+      <button id="tabLogin" class="active">Se connecter</button>
+      <button id="tabRegister">Créer un compte</button>
+    </div>
+    <div class="gate-err" id="authErr"></div>
+
+    <form id="formLogin">
+      <div class="field"><input type="email" id="li_email" placeholder="Email" required></div>
+      <div class="field pwd-field"><input type="password" id="li_password" placeholder="Mot de passe" required><button type="button" class="pwd-toggle" data-toggle="li_password" aria-label="Afficher le mot de passe"></button></div>
+      <button type="submit" class="btn gold">Se connecter</button>
+    </form>
+
+    <form id="formRegister" class="hidden">
+      <div class="field"><input type="text" id="re_nom" placeholder="Nom de l'entreprise" required></div>
+      <div class="field"><input type="email" id="re_email" placeholder="Email" required></div>
+      <div class="field"><label>Pays</label><select id="re_country"></select></div>
+      <div class="field"><label>Téléphone (WhatsApp)</label>
+        <div class="phone-group"><span class="phone-dial" id="re_dial">+225</span><input type="tel" id="re_phone" placeholder="XX XX XX XX XX" required></div>
+        <div class="phone-hint" id="re_phone_hint"></div>
+      </div>
+      <div class="field pwd-field"><input type="password" id="re_password" placeholder="Mot de passe (6 caractères min.)" required><button type="button" class="pwd-toggle" data-toggle="re_password" aria-label="Afficher le mot de passe"></button></div>
+      <button type="submit" class="btn gold">Créer mon compte</button>
+    </form>
+    <div class="gate-foot" id="authFoot"><a id="btnForgot">Mot de passe oublié ?</a></div>
+  </div>
+</div>
+
+<div id="screen-forgot" class="gate hidden">
+  <div class="gate-box">
+    <div class="gate-brand"><div class="mark">TAPA <span>CONSEIL</span></div><div class="sub">TAPA FinModel</div></div>
+    <h2>Mot de passe oublié</h2>
+    <p class="desc">Entrez votre email : nous vous envoyons un lien pour choisir un nouveau mot de passe.</p>
+    <div class="gate-err" id="forgotErr"></div>
+    <div class="gate-loading hidden" id="forgotOk">Si un compte existe avec cet email, un lien vient d'être envoyé. Vérifiez votre boîte de réception.</div>
+    <form id="formForgot">
+      <div class="field"><input type="email" id="fp_email" placeholder="Email" required></div>
+      <button type="submit" class="btn gold">Envoyer le lien</button>
+    </form>
+    <div class="gate-foot"><a id="btnBackToLogin">Retour à la connexion</a></div>
+  </div>
+</div>
+
+<div id="screen-reset" class="gate hidden">
+  <div class="gate-box">
+    <div class="gate-brand"><div class="mark">TAPA <span>CONSEIL</span></div><div class="sub">TAPA FinModel</div></div>
+    <h2>Nouveau mot de passe</h2>
+    <div class="gate-err" id="resetErr"></div>
+    <form id="formReset">
+      <div class="field pwd-field"><input type="password" id="rp_password" placeholder="Nouveau mot de passe (6 caractères min.)" required><button type="button" class="pwd-toggle" data-toggle="rp_password" aria-label="Afficher le mot de passe"></button></div>
+      <button type="submit" class="btn gold">Valider</button>
+    </form>
+  </div>
+</div>
+
+<div id="screen-verify-pending" class="gate hidden">
+  <div class="gate-box" style="text-align:center;">
+    <div class="gate-brand"><div class="mark">TAPA <span>CONSEIL</span></div><div class="sub">TAPA FinModel</div></div>
+    <h2>Vérifiez votre email</h2>
+    <p class="desc">Un email a été envoyé à <b id="vp_email"></b>. Cliquez sur le lien qu'il contient pour confirmer votre compte.</p>
+    <div style="background:#fdf8ec;border:1px solid var(--gold);border-radius:8px;padding:12px 14px;text-align:left;font-size:13px;color:var(--ink);margin:12px 0;">📩 Pensez à vérifier vos <b>courriers indésirables (spam)</b> — les tout premiers emails d'un nouveau service y atterrissent parfois, le temps que votre messagerie apprenne à nous reconnaître.</div>
+    <p class="note" style="text-align:left;">Si l'adresse ci-dessus contient une faute de frappe, recommencez l'inscription avec la bonne adresse.</p>
+    <div class="gate-err" id="verifyPendingErr"></div>
+    <div class="gate-loading hidden" id="verifyPendingOk">Un nouvel email vient d'être envoyé.</div>
+    <button class="btn ghost" id="btnResendVerify" style="width:100%;margin-top:10px;">Renvoyer l'email</button>
+    <div class="gate-foot"><a id="btnVerifyBackToLogin">Retour à la connexion</a></div>
+  </div>
+</div>
+
+<div id="screen-paywall" class="gate hidden">
+  <div class="gate-box" style="max-width:460px;">
+    <div class="gate-brand"><div class="mark">TAPA <span>CONSEIL</span></div><div class="sub">TAPA FinModel</div></div>
+    <h2 id="pw_title">Débloquez vos documents financiers</h2>
+    <p class="desc" id="pw_desc">Un accès complet pour préparer votre dossier de demande de crédit.</p>
+    <div class="paywall-price"><div class="amount" id="pw_amount">…</div><div class="label" id="pw_label">Paiement — accès 30 jours</div></div>
+    <div id="pw_palier" style="font-size:12px;color:var(--ink-soft);text-align:center;margin-top:-8px;margin-bottom:8px;"></div>
+    <ul class="paywall-list" id="pw_list">
+      <li>Plan de trésorerie, compte de résultat, bilan, plan de financement</li>
+      <li>Export PDF prêt pour votre banque</li>
+      <li>Export Excel réutilisable</li>
+      <li>Accès pendant 30 jours — pratique si la banque demande des ajustements</li>
+    </ul>
+    <div id="pw_surdevis" class="hidden" style="background:#fdf8ec;border:1px solid var(--gold);border-radius:8px;padding:14px 16px;font-size:13.5px;color:var(--ink);margin-bottom:14px;">
+      <p style="margin:0 0 10px;">Votre projet dépasse le seuil géré automatiquement — nous devons établir un devis personnalisé avec vous.</p>
+      <a href="https://wa.me/2250504775774" target="_blank" class="btn gold" style="display:block;text-align:center;text-decoration:none;">Contacter TAPA CONSEIL sur WhatsApp</a>
+    </div>
+    <div class="gate-err" id="payErr"></div>
+    <div class="pay-methods" id="payMethods"></div>
+    <button class="btn gold" id="btnPay">Payer avec Paiement Pro</button>
+    <div id="pw_pack" class="hidden" style="border-top:1px solid var(--paper-line);margin-top:16px;padding-top:14px;text-align:center;">
+      <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 8px;">Vous avez aussi besoin d'un Business Plan complet ?</p>
+      <button type="button" class="btn ghost" id="btnShowPack" style="width:100%;">Voir le Pack Création (FinModel + Business Plan)</button>
+    </div>
+    <div class="gate-foot"><a id="btnLogout2">Se déconnecter</a></div>
+  </div>
+</div>
+
+<div id="screen-account" class="gate hidden">
+  <div class="gate-box">
+    <div class="gate-brand"><div class="mark">TAPA <span>CONSEIL</span></div><div class="sub">Mon compte</div></div>
+    <div class="gate-err" id="accountErr"></div>
+    <div class="gate-loading hidden" id="accountOk">Modifications enregistrées.</div>
+    <form id="formAccount">
+      <div class="field"><input type="text" id="ac_nom" placeholder="Nom de l'entreprise"></div>
+      <div class="field"><label>Pays</label><select id="ac_country"></select></div>
+      <div class="field"><label>Téléphone</label>
+        <div class="phone-group"><span class="phone-dial" id="ac_dial">+225</span><input type="tel" id="ac_phone" placeholder="XX XX XX XX XX"></div>
+        <div class="phone-hint" id="ac_phone_hint"></div>
+      </div>
+      <div class="field pwd-field"><input type="password" id="ac_currentPassword" placeholder="Mot de passe actuel (pour changer de mot de passe)"><button type="button" class="pwd-toggle" data-toggle="ac_currentPassword" aria-label="Afficher le mot de passe"></button></div>
+      <div class="field pwd-field"><input type="password" id="ac_newPassword" placeholder="Nouveau mot de passe (facultatif)"><button type="button" class="pwd-toggle" data-toggle="ac_newPassword" aria-label="Afficher le mot de passe"></button></div>
+      <button type="submit" class="btn gold">Enregistrer</button>
+    </form>
+    <div class="gate-foot"><a id="btnBackToApp">Retour au dossier</a></div>
+  </div>
+</div>
+
+<div id="screen-verifying" class="gate hidden">
+  <div class="gate-box" style="text-align:center;">
+    <div class="gate-brand"><div class="mark">TAPA <span>CONSEIL</span></div></div>
+    <p class="gate-loading">Vérification de votre paiement en cours…</p>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <div id="welcomeToast" class="welcome-toast"></div>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark"><img src="logo.png" alt="" class="brand-logo" onerror="this.classList.add('hidden')">TAPA <span>DOC</span></div>
+      <div class="sub">TAPA FinModel</div>
+    </div>
+    <nav class="tabs" id="tabs"></nav>
+    <div class="sidebar-foot">
+      <div style="font-size:11px;color:#9fb0d0;">Besoin d'un accompagnement ?</div>
+      <a href="https://wa.me/2250504775774?text=Bonjour%2C%20je%20souhaite%20un%20devis%20pour%20un%20accompagnement%20Documents%20Financiers" target="_blank">WhatsApp conseiller →</a>
+      <a href="mailto:formationella398@gmail.com">formationella398@gmail.com</a>
+      <a id="btnAccount" style="margin-top:10px;">Mon compte</a>
+      <a id="btnLogout">Se déconnecter</a>
+    </div>
+  </aside>
+
+  <div class="content">
+    <div class="topbar">
+      <div class="ctx" id="ctxBar">Nouveau dossier — commencez par la <b>Fiche Entreprise</b></div>
+      <div class="exports">
+        <div class="scenario-switch" id="scenarioSwitch">
+          <button type="button" data-scenario="prudent">Prudent</button>
+          <button type="button" data-scenario="realiste" class="active">Réaliste</button>
+          <button type="button" data-scenario="ambitieux">Ambitieux</button>
+        </div>
+        <span class="ctx" id="classifBadge"></span>
+        <span class="ctx" id="accessBadge"></span>
+        <span class="save-indicator" id="saveIndicator" style="opacity:0;"></span>
+        <button class="btn ghost" id="btnReset">Réinitialiser</button>
+        <button class="btn" id="btnExcel">Exporter Excel</button>
+        <button class="btn gold" id="btnPdf">Générer le dossier PDF</button>
+      </div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-label" id="progressLabel">0/7 étapes complétées</div>
+    </div>
+
+    <section class="view" id="view-0">
+      <div class="view-head"><div class="eyebrow">Étape I</div><h2>Fiche Entreprise</h2></div>
+      <p class="view-desc">Quelques informations sur vous et votre entreprise. Les champs marqués "facultatif" peuvent rester vides.</p>
+      <div class="hr"></div>
+      <div class="gate-err" id="ficheErr" style="display:none;margin-bottom:16px;"></div>
+      <div class="card">
+        <h3>Devise</h3>
+        <div class="grid">
+          <div class="field"><label>Dans quelle monnaie comptez-vous ?</label>
+            <select id="f_devise"></select>
+          </div>
+        </div>
+        <p class="note" style="margin-top:12px;">Tous les montants de votre dossier seront affichés dans cette monnaie.</p>
+      </div>
+      <div class="card">
+        <h3>Fiscalité</h3>
+        <div class="grid">
+          <div class="field"><label>TVA applicable (%)</label><input id="f_tva" type="number" min="0" step="0.5" placeholder="18"></div>
+        </div>
+        <p class="note" style="margin-top:12px;">18% est le taux standard en Côte d'Ivoire. Les charges sociales sur salaires (ITS, CNPS, CFCE) sont calculées automatiquement à l'Étape II dès que vous renseignez une ligne "Salaires".</p>
+      </div>
+      <div class="card">
+        <h3>Votre entreprise</h3>
+        <div class="grid">
+          <div class="field"><label>Nom de l'entreprise</label><input id="f_nom" type="text" placeholder="Ex : TAPA BOL"></div>
+          <div class="field"><label>Secteur d'activité</label>
+            <select id="f_secteur"></select>
+          </div>
+          <div class="field hidden" id="f_secteurAutreWrap"><label>Précisez votre secteur</label><input id="f_secteurAutre" type="text" placeholder="Ex : Élevage de volailles"></div>
+          <div class="field"><label>Forme juridique (facultatif)</label>
+            <select id="f_forme"><option>Entreprise individuelle</option><option>SARL</option><option>SARLU</option><option>SA</option><option>SAS</option><option>GIE</option><option>Autre</option></select>
+          </div>
+          <div class="field"><label>Date de création (facultatif)</label><input id="f_date" type="date"></div>
+          <div class="field"><label>Capital social (facultatif)</label><input id="f_capital" type="text" inputmode="numeric" data-money placeholder="Laissez vide si aucun"></div>
+          <div class="field"><label>Argent personnel déjà investi (facultatif)</label><input id="f_apport" type="text" inputmode="numeric" data-money placeholder="Laissez vide si aucun"></div>
+          <div class="field"><label>Combien de personnes travaillent (ou travailleront) pour vous ?</label><input id="f_effectif" type="number" min="0" step="1" placeholder="Ex: 3"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Le crédit que vous demandez</h3>
+        <div class="grid">
+          <div class="field"><label>Combien voulez-vous emprunter ?</label><input id="f_montant" type="text" inputmode="numeric" data-money placeholder="Ex: 2 000 000"></div>
+          <div class="field"><label>Sur combien de mois voulez-vous rembourser ?</label><input id="f_duree" type="number" min="1" step="1" placeholder="Ex: 24"></div>
+          <div class="field"><label>Taux d'intérêt (facultatif — demandez à votre banque)</label><input id="f_taux" type="number" min="0" step="0.1" placeholder="Ex: 8"></div>
+          <div class="field" style="grid-column:1/-1;"><label>Pour quoi voulez-vous ce crédit ?</label><input id="f_objet" type="text" placeholder="Ex : acheter du matériel, démarrer mon activité..."></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-1">
+      <div class="view-head"><div class="eyebrow">Étape II · Gratuit</div><h2>Compte de Résultat Prévisionnel — 12 mois</h2></div>
+      <p class="view-desc">Deux questions simples : combien vous vendez, et ce que ça vous coûte. Indiquez un montant de départ (Mois 1) et une variation mensuelle si vos ventes ou charges évoluent : l'outil calcule le reste automatiquement.</p>
+      <div class="hr"></div>
+
+      <div class="parlons-card">
+        <h3>💬 Parlons de vos ventes</h3>
+        <div class="parlons-sub">Indiquez combien vous pensez vendre par mois. C'est tout.</div>
+        <div class="lignes-list" id="ventesList"></div>
+        <div class="add-custom-row">
+          <input type="text" id="ventesCustomInput" placeholder="Ex : Vente de vêtements, Prestations de service...">
+          <button class="btn ghost" id="btnAddVente">+ Ajouter une source de revenu</button>
+        </div>
+      </div>
+
+      <div class="parlons-card">
+        <h3>💬 Avez-vous reçu un apport ou un financement ?</h3>
+        <div class="parlons-sub">De l'argent apporté par vous-même, un associé, ou un prêt déjà reçu — ce n'est pas une vente, donc ça ne compte jamais dans votre chiffre d'affaires. Laissez vide si ça ne vous concerne pas.</div>
+        <div class="lignes-list" id="apportsList"></div>
+        <div class="add-custom-row">
+          <input type="text" id="apportsCustomInput" placeholder="Ex : Apport personnel, Prêt associé, Emprunt bancaire déjà reçu...">
+          <button class="btn ghost" id="btnAddApport">+ Ajouter un apport ou financement</button>
+        </div>
+      </div>
+
+      <div class="parlons-card">
+        <h3>💬 Parlons de vos charges</h3>
+        <div class="parlons-sub">Choisissez ce que vous dépensez chaque mois, et indiquez le montant.</div>
+        <p class="note" style="margin-top:-6px;">Pour "Salaires & charges sociales", indiquez ce que vous versez réellement à vos employés (le net) — l'outil calcule et ajoute automatiquement en dessous ce que votre entreprise doit reverser en plus à l'État (ITS, CNPS, CFCE).</p>
+        <div class="lignes-list" id="chargesList"></div>
+        <div class="catalogue-label">Charges courantes — cliquez pour ajouter :</div>
+        <div class="catalogue-chips" id="chargesCatalogue"></div>
+        <div class="add-custom-row">
+          <input type="text" id="chargesCustomInput" placeholder="Une autre charge non listée ? Précisez ici...">
+          <button class="btn ghost" id="btnAddCharge">+ Ajouter</button>
+        </div>
+      </div>
+
+      <div class="view-head" style="margin-top:8px;"><h2 style="font-size:19px;">Récapitulatif condensé</h2></div>
+      <p class="view-desc" style="margin-top:0;">Le détail de ce que vous avez choisi ci-dessus, mois par mois, avec le résultat calculé automatiquement.</p>
+      <div class="tbl-wrap"><table class="ledger" id="tbl-resultat-mensuel"></table></div>
+      <p class="note">Ce document, gratuit, sert aussi de base à votre Compte de résultat sur 5 ans (Étape III) : la somme de vos 12 mois devient automatiquement votre Année 1.</p>
+      <div class="card" style="margin-top:20px;"><h3>Chiffre d'affaires &amp; résultat net mensuels</h3><div style="height:280px;position:relative;"><canvas id="resultatMensuelChart"></canvas></div></div>
+    </section>
+
+    <section class="view" id="view-2">
+      <div class="view-head"><div class="eyebrow">Étape III</div><h2>Compte de Résultat Prévisionnel — 5 ans</h2></div>
+
+      <p class="view-desc">Votre Année 1 est déjà remplie (reprise automatiquement de l'Étape II). Pour les années 2 à 5, indiquez juste un pourcentage de croissance si vous pensez faire mieux chaque année — sinon laissez à 0 et le montant restera le même.</p>
+      <div class="hr"></div>
+      <div class="tbl-wrap"><table class="ledger" id="tbl-resultat"></table></div>
+      <div class="field" style="max-width:320px;margin-top:16px;">
+        <label>Impôt sur les bénéfices (%) — laissez tel quel si vous ne savez pas</label>
+        <input id="r_tauxIS" type="number" min="0" step="0.5" placeholder="25">
+      </div>
+      <div id="tee_note" class="hidden" style="background:#fdf8ec;border:1px solid var(--gold);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--ink);margin-top:10px;max-width:520px;"></div>
+      <div class="card" style="margin-top:20px;"><h3>Chiffre d'affaires &amp; résultat net</h3><div style="height:280px;position:relative;"><canvas id="resultatChart"></canvas></div></div>
+    </section>
+
+    <section class="view" id="view-3">
+      <div class="view-head"><div class="eyebrow">Étape IV</div><h2>Bilan Prévisionnel — 5 ans</h2></div>
+      <p class="view-desc"><b>Vous n'avez rien à remplir ici.</b> L'outil construit automatiquement votre bilan (actif, passif, capitaux propres) à partir de vos réponses aux étapes Compte de Résultat, Trésorerie et Financement.</p>
+      <div class="hr"></div>
+      <div class="status-bar ok" id="bilanScenarioNote" style="display:inline-flex;"></div>
+      <div id="bilanStatus"></div>
+      <div class="tbl-wrap"><table class="ledger" id="tbl-bilan"></table></div>
+      <p class="note">Méthode : les immobilisations proviennent de vos investissements (étape Financement), diminuées des amortissements. Le besoin en fonds de roulement évolue proportionnellement à votre chiffre d'affaires. La trésorerie et les résultats cumulés sont repris de vos étapes précédentes. Simplification pédagogique : le remboursement du capital de l'emprunt est réparti linéairement sur sa durée — pour un tableau d'amortissement bancaire exact, sollicitez l'accompagnement premium.</p>
+      <div class="card" style="margin-top:20px;"><h3>Actif vs Passif</h3><div style="height:280px;position:relative;"><canvas id="bilanChart"></canvas></div></div>
+    </section>
+
+    <section class="view" id="view-4">
+      <div class="view-head"><div class="eyebrow">Étape V</div><h2>Plan de Trésorerie — 12 mois</h2></div>
+      <p class="view-desc">L'argent qui rentre et l'argent qui sort, mois par mois. Remplissez le Mois 1 pour chaque ligne — le reste se calcule tout seul.</p>
+      <div class="hr"></div>
+      <div class="card">
+        <h3>Avez-vous de l'argent de côté avant de commencer ?</h3>
+        <div class="field" style="max-width:280px;"><label>Laissez à 0 si vous démarrez à zéro</label><input id="f_tresoInit2" type="text" inputmode="numeric" data-money placeholder="0"></div>
+      </div>
+      <div id="tresoAlert"></div>
+      <div class="tbl-wrap"><table class="ledger" id="tbl-treso"></table></div>
+      <p class="note">Si un mois passe en négatif (en rouge), cela veut dire que l'entreprise n'aura pas assez d'argent ce mois-là — c'est ce qu'un banquier regarde en premier.</p>
+      <div class="card" style="margin-top:20px;"><h3>Évolution de la trésorerie</h3><div style="height:280px;position:relative;"><canvas id="tresoChart"></canvas></div></div>
+    </section>
+
+    <section class="view" id="view-5">
+      <div class="view-head"><div class="eyebrow">Étape VI</div><h2>Plan de Financement</h2></div>
+      <p class="view-desc">Deux colonnes simples : à gauche, ce dont vous avez besoin pour démarrer. À droite, l'argent qui va couvrir ce besoin (dont le crédit demandé).</p>
+      <div class="hr"></div>
+      <div id="financementStatus"></div>
+      <div class="grid">
+        <div class="card">
+          <h3>Ce dont vous avez besoin</h3>
+          <table class="ledger" id="tbl-besoins"></table>
+        </div>
+        <div class="card">
+          <h3>Ce qui va couvrir ce besoin</h3>
+          <table class="ledger" id="tbl-ressources"></table>
+        </div>
+      </div>
+      <p class="note">Ce que vous indiquez ici remplit automatiquement votre Bilan (Étape IV) — vous n'avez rien à ressaisir.</p>
+    </section>
+
+    <section class="view" id="view-6">
+      <div class="view-head"><div class="eyebrow">Étape VII</div><h2>Synthèse du dossier</h2></div>
+      <p class="view-desc">Les chiffres clés de votre documents financiers, prêts à être présentés. Les colonnes "Année 2" à "Année 5" reflètent le scénario choisi en haut de l'écran — l'Année 1 reste toujours votre plan réel.</p>
+      <div class="hr"></div>
+      <div class="status-bar ok" id="syntheseScenarioNote" style="display:inline-flex;"></div>
+
+      <div class="card">
+        <h3>Classification du projet</h3>
+        <div id="classifBox"></div>
+      </div>
+
+      <div class="card">
+        <h3>Diagnostic de finançabilité</h3>
+        <div id="diagnosticBox"></div>
+      </div>
+
+      <div class="kpis" id="kpis"></div>
+
+      <div class="card">
+        <h3>Seuil de rentabilité</h3>
+        <div id="seuilBox"></div>
+      </div>
+
+      <div class="card">
+        <h3>Ratios financiers</h3>
+        <div id="ratiosBox"></div>
+      </div>
+
+      <div class="premium">
+        <div>
+          <h3>Faire relire ce dossier par un conseiller TAPA</h3>
+          <p>Un conseiller reprend vos chiffres, sécurise vos hypothèses et prépare l'argumentaire à présenter à votre banquier. Réponse sous 48h.</p>
+        </div>
+        <div class="actions">
+          <a class="btn gold" style="text-decoration:none;display:inline-block;" href="https://wa.me/2250504775774?text=Bonjour%2C%20je%20viens%20de%20remplir%20mes%20documents%20financiers%20et%20je%20souhaite%20un%20devis%20pour%20un%20accompagnement." target="_blank">Demander un devis</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="step-nav">
+      <button class="btn ghost" id="btnPrevStep">← Précédent</button>
+      <span class="step-nav-label" id="stepNavLabel"></span>
+      <button class="btn gold" id="btnNextStep">Suivant →</button>
+    </div>
+
+    <div class="foot">TAPA FinModel — TAPA CONSEIL · "L'Intelligence Financière Pour Tous" · Outil indicatif d'aide à la préparation d'un dossier de crédit ; ne remplace pas l'avis d'un professionnel.</div>
+
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/libphonenumber-js/1.11.4/libphonenumber-js.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+(function(){
+"use strict";
+
+/* ---------- PAYS / TÉLÉPHONE ---------- */
+// Détection défensive du nom global exposé par le bundle libphonenumber-js selon la version CDN.
+const LPN = window.libphonenumber || window['libphonenumber-js'] || window.libphonenumberjs || null;
+let COUNTRIES_LIST=[];
+async function loadCountries(){
+  if(COUNTRIES_LIST.length) return COUNTRIES_LIST;
+  try{
+    const {countries} = await apiFetch('/api/auth/countries');
+    COUNTRIES_LIST=countries;
+  }catch(e){
+    COUNTRIES_LIST=[{code:'CI',name:"Côte d'Ivoire",dial:'225'}];
+  }
+  return COUNTRIES_LIST;
+}
+function fillCountrySelect(selectId, dialId, selectedCode){
+  const sel=document.getElementById(selectId);
+  sel.innerHTML=COUNTRIES_LIST.map(c=>`<option value="${c.code}" ${c.code===selectedCode?'selected':''}>${c.name}</option>`).join('');
+  const dial=document.getElementById(dialId);
+  const update=()=>{ const c=COUNTRIES_LIST.find(c=>c.code===sel.value); if(dial&&c) dial.textContent='+'+c.dial; };
+  update();
+  sel.addEventListener('change', update);
+}
+function validatePhoneField(countrySelectId, phoneInputId, hintId){
+  const country=document.getElementById(countrySelectId).value;
+  const input=document.getElementById(phoneInputId);
+  const hint=document.getElementById(hintId);
+  if(!LPN || !input.value.trim()){ if(hint) hint.textContent=''; return true; }
+  try{
+    const valid = LPN.isValidPhoneNumber ? LPN.isValidPhoneNumber(input.value, country) : true;
+    if(hint){
+      hint.textContent = valid ? '✓ Numéro valide' : 'Numéro invalide pour ce pays';
+      hint.className = 'phone-hint '+(valid?'valid':'invalid');
+    }
+    return valid;
+  }catch(e){ return true; }
+}
+function fullPhone(countrySelectId, phoneInputId){
+  const country=document.getElementById(countrySelectId).value;
+  const raw=document.getElementById(phoneInputId).value.trim();
+  if(!raw) return '';
+  if(LPN && LPN.parsePhoneNumberFromString){
+    try{ const p=LPN.parsePhoneNumberFromString(raw, country); if(p) return p.number; }catch(e){}
+  }
+  const dial=(COUNTRIES_LIST.find(c=>c.code===country)||{}).dial||'';
+  return raw.startsWith('+') ? raw : '+'+dial+raw.replace(/\D/g,'');
+}
+
+/* ---------- AUTH / PAYWALL / COMPTE / DOSSIER ---------- */
+// Adaptez cette URL à l'adresse réelle de votre backend une fois déployé sur Railway.
+const API_BASE = ''; // même origine : le backend sert aussi ces pages statiques
+const PRODUCT = 'finmodel'; // identifie ce produit auprès du backend (tarification différenciée)
+// La session est conservée d'une visite à l'autre via localStorage, comme demandé.
+// Remarque : si ce fichier est prévisualisé dans un panneau d'artefact (ex. dans Claude.ai),
+// le stockage navigateur peut être bloqué par l'environnement d'aperçu — cela fonctionne
+// normalement une fois le fichier hébergé sur votre propre domaine (OVH, Railway, etc.).
+let authToken = null;
+try { authToken = localStorage.getItem('precred_token') || null; } catch(e){ authToken = null; }
+
+function setToken(t){
+  authToken = t;
+  try{ if(t) localStorage.setItem('precred_token', t); else localStorage.removeItem('precred_token'); }catch(e){}
+}
+
+function apiFetch(path, opts){
+  opts = opts||{};
+  opts.headers = Object.assign({'Content-Type':'application/json'}, opts.headers||{}, authToken?{'Authorization':'Bearer '+authToken}:{});
+  return fetch(API_BASE+path, opts).then(async r=>{
+    const data = await r.json().catch(()=>({}));
+    if(!r.ok){ const e=new Error(data.message||data.error||"Une erreur est survenue."); e.code=data.error; e.phone=data.phone; throw e; }
+    return data;
+  });
+}
+const ALL_SCREENS=['screen-landing','screen-auth','screen-forgot','screen-reset','screen-verify-pending','screen-paywall','screen-account','screen-verifying','app'];
+function showScreen(id){
+  ALL_SCREENS.forEach(s=>{ document.getElementById(s).classList.toggle('hidden', s!==id); });
+}
+function showErr(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display=msg?'block':'none';}
+
+function goToRegister(){
+  showScreen('screen-auth');
+  document.getElementById('tabRegister').click();
+}
+function goToLogin(){
+  showScreen('screen-auth');
+  document.getElementById('tabLogin').click();
+}
+['navStart','heroStart','pricingStart'].forEach(id=>document.getElementById(id).addEventListener('click', goToRegister));
+['navLogin','heroLogin'].forEach(id=>document.getElementById(id).addEventListener('click', goToLogin));
+
+const EYE_OPEN=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+const EYE_CLOSED=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.6 18.6 0 0 1 5.06-5.94M9.9 4.24A10.6 10.6 0 0 1 12 4c7 0 11 8 11 8a18.6 18.6 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+document.querySelectorAll('.pwd-toggle').forEach(btn=>{
+  btn.innerHTML=EYE_OPEN;
+  btn.addEventListener('click',()=>{
+    const input=document.getElementById(btn.dataset.toggle);
+    const show=input.type==='password';
+    input.type=show?'text':'password';
+    btn.innerHTML=show?EYE_CLOSED:EYE_OPEN;
+    btn.setAttribute('aria-label',show?'Masquer le mot de passe':'Afficher le mot de passe');
+  });
+});
+
+document.getElementById('tabLogin').onclick=()=>{
+  document.getElementById('tabLogin').classList.add('active');
+  document.getElementById('tabRegister').classList.remove('active');
+  document.getElementById('formLogin').classList.remove('hidden');
+  document.getElementById('formRegister').classList.add('hidden');
+  showErr('authErr','');
+};
+document.getElementById('tabRegister').onclick=async ()=>{
+  document.getElementById('tabRegister').classList.add('active');
+  document.getElementById('tabLogin').classList.remove('active');
+  document.getElementById('formRegister').classList.remove('hidden');
+  document.getElementById('formLogin').classList.add('hidden');
+  showErr('authErr','');
+  await loadCountries();
+  fillCountrySelect('re_country','re_dial','CI');
+};
+document.getElementById('re_phone').addEventListener('input',()=>validatePhoneField('re_country','re_phone','re_phone_hint'));
+document.getElementById('re_country').addEventListener('change',()=>validatePhoneField('re_country','re_phone','re_phone_hint'));
+
+document.getElementById('btnForgot').addEventListener('click',()=>{ showErr('authErr',''); showScreen('screen-forgot'); });
+document.getElementById('btnBackToLogin').addEventListener('click',()=>{ showScreen('screen-auth'); });
+document.getElementById('btnBackToApp').addEventListener('click',()=>{ showScreen('app'); });
+
+document.getElementById('formLogin').addEventListener('submit', async e=>{
+  e.preventDefault(); showErr('authErr','');
+  try{
+    const data = await apiFetch('/api/auth/login',{method:'POST',body:JSON.stringify({
+      email:document.getElementById('li_email').value, password:document.getElementById('li_password').value
+    })});
+    setToken(data.token);
+    afterAuth(data.user);
+  }catch(err){
+    if(err.code==='NOT_VERIFIED'){
+      document.getElementById('vp_email').textContent=document.getElementById('li_email').value;
+      showErr('verifyPendingErr',''); document.getElementById('verifyPendingOk').classList.add('hidden');
+      showScreen('screen-verify-pending');
+    } else {
+      showErr('authErr',err.message);
+    }
+  }
+});
+
+document.getElementById('formRegister').addEventListener('submit', async e=>{
+  e.preventDefault(); showErr('authErr','');
+  if(!validatePhoneField('re_country','re_phone','re_phone_hint')){
+    showErr('authErr','Le numéro de téléphone saisi ne correspond pas au pays sélectionné.');
+    return;
+  }
+  try{
+    const data = await apiFetch('/api/auth/register',{method:'POST',body:JSON.stringify({
+      nomEntreprise:document.getElementById('re_nom').value,
+      email:document.getElementById('re_email').value,
+      country:document.getElementById('re_country').value,
+      phone:fullPhone('re_country','re_phone'),
+      password:document.getElementById('re_password').value
+    })});
+    document.getElementById('vp_email').textContent=data.email;
+    showErr('verifyPendingErr',''); document.getElementById('verifyPendingOk').classList.add('hidden');
+    showScreen('screen-verify-pending');
+  }catch(err){
+    if(/existe déjà/i.test(err.message)){
+      const el=document.getElementById('authErr');
+      el.innerHTML='Ce compte existe déjà. <a id="dupLoginLink" style="text-decoration:underline;cursor:pointer;font-weight:700;">Se connecter</a> ou <a id="dupForgotLink" style="text-decoration:underline;cursor:pointer;font-weight:700;">mot de passe oublié ?</a>';
+      el.style.display='block';
+      document.getElementById('dupLoginLink').addEventListener('click',()=>{ document.getElementById('tabLogin').click(); document.getElementById('li_email').value=document.getElementById('re_email').value; });
+      document.getElementById('dupForgotLink').addEventListener('click',()=>{ document.getElementById('fp_email').value=document.getElementById('re_email').value; showScreen('screen-forgot'); });
+    } else {
+      showErr('authErr',err.message);
+    }
+  }
+});
+
+document.getElementById('btnResendVerify').addEventListener('click', async ()=>{
+  showErr('verifyPendingErr','');
+  try{
+    await apiFetch('/api/auth/resend-verification',{method:'POST',body:JSON.stringify({email:document.getElementById('vp_email').textContent})});
+    document.getElementById('verifyPendingOk').classList.remove('hidden');
+  }catch(err){ showErr('verifyPendingErr',err.message); }
+});
+document.getElementById('btnVerifyBackToLogin').addEventListener('click',()=>{ showScreen('screen-auth'); document.getElementById('tabLogin').click(); });
+
+document.getElementById('formForgot').addEventListener('submit', async e=>{
+  e.preventDefault(); showErr('forgotErr','');
+  try{
+    await apiFetch('/api/auth/forgot-password',{method:'POST',body:JSON.stringify({email:document.getElementById('fp_email').value})});
+    document.getElementById('formForgot').classList.add('hidden');
+    document.getElementById('forgotOk').classList.remove('hidden');
+  }catch(err){ showErr('forgotErr',err.message); }
+});
+
+document.getElementById('formReset').addEventListener('submit', async e=>{
+  e.preventDefault(); showErr('resetErr','');
+  try{
+    await apiFetch('/api/auth/reset-password',{method:'POST',body:JSON.stringify({
+      token:resetToken, newPassword:document.getElementById('rp_password').value
+    })});
+    showScreen('screen-auth');
+    document.getElementById('tabLogin').click();
+    showErr('authErr','Mot de passe modifié. Vous pouvez vous connecter.');
+  }catch(err){ showErr('resetErr',err.message); }
+});
+
+document.getElementById('ac_phone').addEventListener('input',()=>validatePhoneField('ac_country','ac_phone','ac_phone_hint'));
+document.getElementById('ac_country').addEventListener('change',()=>validatePhoneField('ac_country','ac_phone','ac_phone_hint'));
+
+document.getElementById('formAccount').addEventListener('submit', async e=>{
+  e.preventDefault(); showErr('accountErr',''); document.getElementById('accountOk').classList.add('hidden');
+  if(!validatePhoneField('ac_country','ac_phone','ac_phone_hint')){
+    showErr('accountErr','Le numéro de téléphone saisi ne correspond pas au pays sélectionné.');
+    return;
+  }
+  try{
+    const body={
+      nomEntreprise:document.getElementById('ac_nom').value,
+      country:document.getElementById('ac_country').value,
+      phone:fullPhone('ac_country','ac_phone')
+    };
+    const newPassword=document.getElementById('ac_newPassword').value;
+    if(newPassword){ body.newPassword=newPassword; body.currentPassword=document.getElementById('ac_currentPassword').value; }
+    const data = await apiFetch('/api/auth/me',{method:'PATCH',body:JSON.stringify(body)});
+    currentUser=data.user;
+    document.getElementById('accountOk').classList.remove('hidden');
+    document.getElementById('ac_currentPassword').value=''; document.getElementById('ac_newPassword').value='';
+  }catch(err){ showErr('accountErr',err.message); }
+});
+document.getElementById('btnAccount').addEventListener('click', async e=>{
+  e.preventDefault();
+  document.getElementById('ac_nom').value=currentUser?.nomEntreprise||'';
+  document.getElementById('ac_phone').value=currentUser?.phone||'';
+  showErr('accountErr',''); document.getElementById('accountOk').classList.add('hidden');
+  await loadCountries();
+  fillCountrySelect('ac_country','ac_dial',currentUser?.country||'CI');
+  showScreen('screen-account');
+});
+
+let currentUser=null;
+let returningFromPayment=false;
+let resetToken=null;
+let pendingExport=null; // 'pdf' | 'excel' | null — export demandé avant d'avoir un accès actif
+
+async function afterAuth(user){
+  currentUser=user;
+  if(returningFromPayment){ pollPaymentStatus(); }
+  else { await loadDossierAndEnter(); }
+}
+
+let selectedChannel='';
+let payingPack=false;
+async function showPaywall(){
+  showScreen('screen-paywall');
+  showErr('payErr','');
+  payingPack=false;
+  document.getElementById('pw_amount').textContent='…';
+  document.getElementById('pw_palier').textContent='';
+  document.getElementById('pw_surdevis').classList.add('hidden');
+  document.getElementById('pw_list').classList.remove('hidden');
+  document.getElementById('payMethods').classList.remove('hidden');
+  document.getElementById('btnPay').classList.remove('hidden');
+  document.getElementById('pw_pack').classList.add('hidden');
+  try{
+    const price = await apiFetch('/api/payment/price?product='+PRODUCT);
+    if(price.surDevis){
+      document.getElementById('pw_title').textContent='Un devis personnalisé pour votre projet';
+      document.getElementById('pw_desc').textContent="Votre projet dépasse le seuil que nous traitons automatiquement.";
+      document.getElementById('pw_amount').textContent='Sur devis';
+      document.getElementById('pw_label').textContent=price.label||'';
+      document.getElementById('pw_list').classList.add('hidden');
+      document.getElementById('pw_surdevis').classList.remove('hidden');
+      document.getElementById('payMethods').classList.add('hidden');
+      document.getElementById('btnPay').classList.add('hidden');
+      return;
+    }
+    document.getElementById('pw_amount').textContent = fmt(price.amount)+' FCFA';
+    document.getElementById('pw_palier').textContent = price.label ? ('Palier : '+price.label) : '';
+    const label = price.kind==='update' ? 'Paiement — mise à jour, 30 jours' : 'Paiement — accès 30 jours';
+    document.getElementById('pw_label').textContent = label;
+    if(pendingExport){
+      document.getElementById('pw_title').textContent='Débloquez le téléchargement de votre dossier';
+      document.getElementById('pw_desc').textContent="Votre dossier est prêt. Ce paiement débloque l'export PDF et Excel, ainsi que l'accès complet, pendant 30 jours.";
+    } else {
+      document.getElementById('pw_title').textContent='Débloquez la suite de votre dossier';
+      document.getElementById('pw_desc').textContent="Le Compte de résultat 12 mois est gratuit. Ce paiement débloque le Compte de résultat 5 ans, le Bilan, la Trésorerie, le Plan de financement et l'export PDF/Excel, pendant 30 jours.";
+    }
+    document.getElementById('pw_pack').classList.remove('hidden');
+  }catch(err){ showErr('payErr',err.message); }
+  try{
+    const {methods} = await apiFetch('/api/payment/methods');
+    renderPayMethods(methods);
+  }catch(err){ renderPayMethods([]); }
+}
+document.getElementById('btnShowPack').addEventListener('click', async ()=>{
+  showErr('payErr','');
+  try{
+    const pack = await apiFetch('/api/payment/pack/price');
+    if(pack.alreadyActive){ document.getElementById('pw_pack').classList.add('hidden'); return; }
+    if(pack.surDevis){
+      showErr('payErr','Votre projet dépasse le seuil du Pack Création — contactez TAPA CONSEIL directement.');
+      return;
+    }
+    payingPack=true;
+    document.getElementById('pw_title').textContent='Pack Création — FinModel + Business Plan';
+    document.getElementById('pw_desc').textContent="Les deux outils débloqués en un seul paiement, à prix réduit.";
+    document.getElementById('pw_amount').textContent=fmt(pack.amount)+' FCFA';
+    document.getElementById('pw_palier').textContent='Palier : '+pack.label+(pack.economie?(' · vous économisez '+fmt(pack.economie)+' FCFA'):'');
+    document.getElementById('pw_label').textContent='Paiement — accès 30 jours aux deux outils';
+    document.getElementById('pw_pack').classList.add('hidden');
+  }catch(err){ showErr('payErr',err.message); }
+});
+function requestExport(kind){
+  if(currentUser && currentUser.active){ runExport(kind); return; }
+  pendingExport=kind;
+  showPaywall();
+}
+function renderPayMethods(methods){
+  selectedChannel = methods.find(m=>m.confirmed)?.key || '';
+  const box=document.getElementById('payMethods');
+  const btnPay=document.getElementById('btnPay');
+  if(!methods.length){
+    box.innerHTML=`<div class="gate-loading">Aucun moyen de paiement disponible pour votre pays pour le moment. Contactez le support.</div>`;
+    btnPay.disabled=true;
+    return;
+  }
+  box.innerHTML = methods.map(m=>`
+    <button type="button" class="pay-method ${m.key===selectedChannel?'selected':''} ${m.confirmed?'':'disabled'}" data-channel="${m.key}" ${m.confirmed?'':'disabled'}>
+      <span>${m.label}</span>
+      ${m.confirmed?'':'<span class="tag">Bientôt</span>'}
+    </button>`).join('');
+  box.querySelectorAll('.pay-method').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      selectedChannel=btn.dataset.channel;
+      box.querySelectorAll('.pay-method').forEach(b=>b.classList.toggle('selected', b===btn));
+      btnPay.disabled=false;
+    });
+  });
+  btnPay.disabled=!selectedChannel;
+}
+
+document.getElementById('btnPay').addEventListener('click', async ()=>{
+  showErr('payErr','');
+  if(!selectedChannel){ showErr('payErr','Choisissez un moyen de paiement Mobile Money.'); return; }
+  const btn=document.getElementById('btnPay'); btn.disabled=true; btn.textContent='Redirection en cours…';
+  try{
+    const endpoint = payingPack ? '/api/payment/pack/init' : '/api/payment/init';
+    const body = payingPack ? {channel:selectedChannel} : {channel:selectedChannel, product:PRODUCT};
+    const data = await apiFetch(endpoint,{method:'POST',body:JSON.stringify(body)});
+    if(data.alreadyActive){ await backToAppAfterPayment(); return; }
+    if(data.surDevis){ showErr('payErr',data.message||'Ce projet nécessite un devis personnalisé.'); btn.disabled=false; btn.textContent='Payer avec Paiement Pro'; return; }
+    window.location.href = data.url; // redirige vers la page sécurisée Paiement Pro
+  }catch(err){
+    showErr('payErr',err.message);
+    btn.disabled=false; btn.textContent='Payer avec Paiement Pro';
+  }
+});
+
+function logout(){ setToken(null); currentUser=null; appInitialized=false; showScreen('screen-landing'); }
+document.getElementById('btnLogout').addEventListener('click', e=>{e.preventDefault(); logout();});
+document.getElementById('btnLogout2').addEventListener('click', e=>{e.preventDefault(); logout();});
+
+async function pollPaymentStatus(){
+  showScreen('screen-verifying');
+  for(let i=0;i<15;i++){
+    await new Promise(r=>setTimeout(r,2000));
+    try{
+      const me = await apiFetch('/api/auth/me');
+      currentUser=me.user;
+      if(me.user.active){ await backToAppAfterPayment(); return; }
+    }catch(e){ break; }
+  }
+  showPaywall();
+  showErr('payErr',"Paiement non confirmé pour le moment. S'il vient d'être effectué, patientez quelques instants puis réessayez.");
+}
+async function backToAppAfterPayment(){
+  await loadDossierAndEnter();
+  if(pendingView!==null){ current=pendingView; pendingView=null; renderAll(); }
+  if(pendingExport){ runExport(pendingExport); pendingExport=null; }
+}
+
+async function loadDossierAndEnter(){
+  let hadDraft=false;
+  try{
+    const res = await apiFetch('/api/dossier');
+    if(res.data){
+      mergeState(res.data);
+      hadDraft = !!(state.fiche && state.fiche.nom);
+      current = (state.meta && state.meta.currentView) || 0;
+    }
+  }catch(e){ /* pas de dossier existant : on entre avec un dossier vierge */ }
+  updateAccessBadge();
+  showScreen('app');
+  initApp();
+  if(hadDraft) showWelcomeBackToast();
+}
+function showToast(msg){
+  const el=document.getElementById('welcomeToast');
+  if(!el) return;
+  el.textContent=msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),4500);
+}
+function showWelcomeBackToast(){
+  showToast('Bon retour ! Vous reprenez votre dossier "'+(state.fiche.nom||'')+'" là où vous l\'aviez laissé.');
+}
+function mergeState(saved){
+  Object.keys(DEFAULT_STATE).forEach(k=>{
+    if(saved[k]!==undefined) state[k]=JSON.parse(JSON.stringify(saved[k]));
+  });
+  // Migration : l'ancienne Trésorerie (catégories fixes, sujette à des erreurs de classement) est
+  // remplacée par une ligne par ligne du Compte de résultat, y compris pour les apports et
+  // financements. Les anciens montants ne sont pas récupérables proprement (impossible de les
+  // répartir sans deviner à nouveau) — on repart des valeurs par défaut, qui reprennent
+  // automatiquement le Compte de résultat.
+  if(state.treso && (state.treso.enc || Array.isArray(state.treso.apports))){
+    console.warn('Ancien format de Trésorerie détecté — réinitialisé sur les nouvelles valeurs par défaut (reprises du Compte de résultat).');
+    state.treso={ventes:{},apports:{},charges:{},remboursement:zeros(MONTHS)};
+  }
+  if(!state.resultatMensuel.apports) state.resultatMensuel.apports=[]; // dossiers créés avant cet ajout
+}
+function updateAccessBadge(){
+  const el=document.getElementById('accessBadge');
+  if(!el) return;
+  if(currentUser && currentUser.active && currentUser.accessExpiresAt){
+    const d=new Date(currentUser.accessExpiresAt);
+    el.textContent='Accès complet débloqué jusqu\'au '+d.toLocaleDateString('fr-FR');
+  } else {
+    el.textContent='Compte de résultat gratuit — le reste se débloque en payant';
+  }
+  updateClassifBadge();
+}
+function updateClassifBadge(){
+  const el=document.getElementById('classifBadge');
+  if(!el || typeof classificationProjetCalc!=='function') return;
+  const c=classificationProjetCalc();
+  el.textContent='Niveau '+c.niveau+' — '+c.label;
+}
+
+let saveTimer=null;
+let saveIndicatorTimer=null;
+function scheduleSave(){
+  if(!appInitialized) return;
+  if(state.meta) state.meta.currentView = current;
+  showSaveIndicator('saving');
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+    apiFetch('/api/dossier',{method:'PUT',body:JSON.stringify({data:state})})
+      .then(()=>showSaveIndicator('saved'))
+      .catch(()=>showSaveIndicator('error'));
+  },1500);
+}
+function showSaveIndicator(status){
+  const el=document.getElementById('saveIndicator');
+  if(!el) return;
+  clearTimeout(saveIndicatorTimer);
+  if(status==='saving'){ el.textContent='Enregistrement du brouillon…'; el.className='save-indicator saving'; el.style.opacity=1; }
+  else if(status==='saved'){
+    el.textContent='✓ Brouillon enregistré';
+    el.className='save-indicator saved';
+    el.style.opacity=1;
+    saveIndicatorTimer=setTimeout(()=>{ el.style.opacity=0; },2000);
+  } else {
+    el.textContent='⚠ Non enregistré — vérifiez votre connexion';
+    el.className='save-indicator error';
+    el.style.opacity=1;
+  }
+}
+
+(async function boot(){
+  const params = new URLSearchParams(window.location.search);
+  returningFromPayment = params.get('paiement')==='retour';
+  resetToken = params.get('reset');
+  const emailVerifyToken = params.get('verify');
+  if(returningFromPayment || resetToken || emailVerifyToken){ history.replaceState(null,'',window.location.pathname); }
+
+  if(resetToken){ showScreen('screen-reset'); return; }
+
+  if(emailVerifyToken){
+    showScreen('screen-verifying');
+    try{
+      const data = await apiFetch('/api/auth/verify-email',{method:'POST',body:JSON.stringify({token:emailVerifyToken})});
+      setToken(data.token);
+      afterAuth(data.user);
+    }catch(err){
+      showScreen('screen-auth');
+      document.getElementById('tabLogin').click();
+      showErr('authErr',err.message);
+    }
+    return;
+  }
+
+  if(!authToken){
+    if(returningFromPayment){ showScreen('screen-auth'); document.getElementById('tabLogin').click(); showErr('authErr','Reconnectez-vous pour finaliser la vérification de votre paiement.'); }
+    else { showScreen('screen-landing'); }
+    return;
+  }
+  try{
+    const me = await apiFetch('/api/auth/me');
+    afterAuth(me.user);
+  }catch(e){
+    setToken(null);
+    showScreen('screen-landing');
+  }
+})();
+
+/* ---------- STATE ---------- */
+const YEARS=5, MONTHS=12;
+const zeros=n=>Array.from({length:n},()=>0);
+
+const state={
+  meta:{currentView:0},
+  fiche:{nom:'',secteur:'',forme:'Entreprise individuelle',date:'',capital:0,apport:0,montant:0,duree:24,taux:8,tresoInit:0,objet:'',devise:'XOF',effectif:0,tva:18},
+  resultatMensuel:{
+    ventes:[{id:'v1',label:'Ventes / Chiffre d\'affaires',montant:0,croissance:0}],
+    apports:[], // apports en capital, prêts reçus — jamais compté dans le Chiffre d'affaires
+    charges:[]
+  },
+  treso:{
+    ventes:{}, // { [ligneId du Compte de résultat]: {mois: valeur} } — vide = reprend le calcul du Compte de résultat
+    apports:{}, // idem, pour les lignes "Apports et financements"
+    charges:{}, // idem, pour les lignes de charges
+    remboursement:zeros(MONTHS) // remboursement de capital d'emprunt — mouvement de trésorerie pur, absent du Compte de résultat
+  },
+  resultat:{
+    ca:zeros(YEARS),coutVentes:zeros(YEARS),personnel:zeros(YEARS),chargesExploitation:zeros(YEARS),
+    amortissements:zeros(YEARS),interets:zeros(YEARS),
+    tauxIS:25, growth:{ca:0,coutVentes:0,personnel:0,chargesExploitation:0,amortissements:0,interets:0}
+  },
+  financement:{
+    besoins:{fraisEtablissement:0,investissements:0,bfrDemarrage:0},
+    ressources:{subventions:0,autres:0}
+  }
+};
+const DEFAULT_STATE = JSON.parse(JSON.stringify(state));
+
+const RES_PROD=[['ca',"Chiffre d'affaires prévu"]];
+const RES_CHARGE=[['coutVentes',"Coût des ventes"],['personnel',"Charges de personnel"],['chargesExploitation',"Charges d'exploitation"],['amortissements',"Amortissements"],['interets',"Intérêts"]];
+const BESOINS=[['fraisEtablissement',"Frais de dossier / démarrage (facultatif)"],['investissements',"Achats de matériel, véhicule, équipement..."],['bfrDemarrage',"Argent pour tenir le temps d'encaisser les premières ventes"]];
+
+// Catalogue de charges courantes proposées à l'utilisateur (module Compte de résultat 12 mois).
+// La catégorie comptable (2e élément) reste invisible pour l'utilisateur : elle sert seulement
+// au calcul automatique de l'EBE / du résultat.
+const CHARGES_CATALOGUE=[
+  ["Achat de marchandises","coutVentes"],
+  ["Achat de matières premières","coutVentes"],
+  ["Salaires & charges sociales","personnel"],
+  ["Loyer","chargesExploitation"],
+  ["Transport & carburant","chargesExploitation"],
+  ["Fournitures de bureau","chargesExploitation"],
+  ["Communication (téléphone, internet)","chargesExploitation"],
+  ["Électricité & eau","chargesExploitation"],
+  ["Entretien & réparations","chargesExploitation"],
+  ["Assurances","chargesExploitation"],
+  ["Publicité & marketing","chargesExploitation"],
+  ["Frais bancaires","chargesExploitation"],
+  ["Impôts & taxes","chargesExploitation"],
+  ["Amortissements (usure du matériel)","amortissements"],
+  ["Intérêts d'emprunt","interets"],
+];
+
+// Modèles par secteur : dès que l'utilisateur choisit son secteur (Fiche Entreprise), ces charges
+// courantes sont ajoutées automatiquement à l'Étape II — il n'a plus qu'à indiquer les montants.
+const SECTOR_TEMPLATES={
+  "Restauration / Alimentation":["Achat de marchandises","Salaires & charges sociales","Loyer","Électricité & eau","Transport & carburant"],
+  "Commerce / Boutique":["Achat de marchandises","Loyer","Transport & carburant","Communication (téléphone, internet)"],
+  "Couture / Artisanat":["Achat de matières premières","Salaires & charges sociales","Loyer","Fournitures de bureau"],
+  "Coiffure / Beauté":["Achat de marchandises","Salaires & charges sociales","Loyer","Électricité & eau"],
+  "Transport":["Transport & carburant","Entretien & réparations","Assurances","Salaires & charges sociales"],
+  "Services / Prestations":["Salaires & charges sociales","Communication (téléphone, internet)","Fournitures de bureau","Loyer"],
+  "Agriculture / Élevage":["Achat de matières premières","Transport & carburant","Salaires & charges sociales"],
+  "Autre":[]
+};
+const SECTOR_LIST=Object.keys(SECTOR_TEMPLATES);
+
+// Ordres de grandeur indicatifs de rentabilité nette par secteur — à titre d'orientation
+// seulement, pas une statistique officielle. Aide l'utilisateur à situer son résultat.
+const SECTOR_BENCHMARKS={
+  "Restauration / Alimentation":[5,10],
+  "Commerce / Boutique":[3,8],
+  "Couture / Artisanat":[10,20],
+  "Coiffure / Beauté":[15,25],
+  "Transport":[8,15],
+  "Services / Prestations":[15,30],
+  "Agriculture / Élevage":[5,15],
+  "Autre":[5,15]
+};
+
+const fmt=n=>{ n = Math.round(n||0); return n.toLocaleString('fr-FR').replace(/\u202f/g,' '); };
+const num=v=>{const cleaned=String(v==null?'':v).replace(/[^\d.-]/g,'');const n=parseFloat(cleaned);return isFinite(n)?n:0;};
+
+// Devise du dossier : ce module doit pouvoir servir des utilisateurs hors zone Franc CFA.
+const CURRENCIES=[
+  {code:'XOF',label:'Franc CFA — UEMOA (XOF)'},
+  {code:'XAF',label:'Franc CFA — CEMAC (XAF)'},
+  {code:'EUR',label:'Euro (€)'},
+  {code:'USD',label:'Dollar US ($)'},
+  {code:'GHS',label:'Cedi ghanéen (GH₵)'},
+  {code:'NGN',label:'Naira nigérian (₦)'},
+  {code:'MAD',label:'Dirham marocain (MAD)'},
+];
+function curr(){ return state.fiche.devise || 'XOF'; }
+// Formate un montant avec séparateur de milliers ET le code devise (pour les libellés générés en JS).
+const fmtC=n=>fmt(n)+' '+curr();
+
+/* ---------- DERIVED CALCULATIONS ---------- */
+// Le montant encaissé/décaissé d'une ligne reprend automatiquement son équivalent du Compte de
+// résultat (ligneMonthly), sauf pour les mois explicitement ajustés à la main dans la Trésorerie
+// (state.treso.ventes/charges[ligne.id][mois]) — même logique que les overrides du Résultat.
+function tresoLigneMonthly(group,ligne){
+  const override=state.treso[group][ligne.id];
+  const base=ligneMonthly(ligne);
+  if(!override) return base;
+  return base.map((v,i)=>override[i]!==undefined?override[i]:v);
+}
+function tresoMonthlyTotals(){
+  const encTot=zeros(MONTHS), decTot=zeros(MONTHS), solde=zeros(MONTHS), cumule=zeros(MONTHS);
+  for(let m=0;m<MONTHS;m++){
+    let e=0;
+    state.resultatMensuel.ventes.forEach(l=>{ e+=tresoLigneMonthly('ventes',l)[m]; });
+    state.resultatMensuel.apports.forEach(l=>{ e+=tresoLigneMonthly('apports',l)[m]; });
+    let d=state.treso.remboursement[m];
+    state.resultatMensuel.charges.forEach(l=>{
+      d+=tresoLigneMonthly('charges',l)[m];
+      if(l.catalogueKey==='Salaires & charges sociales' && (l.montant||0)>0){
+        const c=chargesSocialesMonthly(l);
+        d+=(c.its[m]||0)+(c.cnpsSalariale[m]||0)+(c.cnpsPatronale[m]||0)+(c.cfce[m]||0);
+      }
+    });
+    encTot[m]=e; decTot[m]=d; solde[m]=e-d;
+    cumule[m]=(m===0? state.fiche.tresoInit : cumule[m-1]) + solde[m];
+  }
+  return {encTot,decTot,solde,cumule};
+}
+
+const RESULTAT_KEYS=['ca','coutVentes','personnel','chargesExploitation','amortissements','interets'];
+
+// Calcule les 12 montants mensuels d'une ligne (ventes ou charge) à partir de son montant de
+// départ (Mois 1) et de sa variation mensuelle en %.
+// Fiscalité sociale sur salaires — Côte d'Ivoire. Barème ITS officiel (réforme 2024, mensuel),
+// CNPS salariale/patronale, CFCE. Estimation globale (à partir d'une masse salariale totale, pas
+// salarié par salarié) — clairement annoncée comme telle partout où elle est affichée.
+const ITS_BAREME_CI=[
+  [0,75000,0],
+  [75000,240000,0.16],
+  [240000,800000,0.21],
+  [800000,2400000,0.24],
+  [2400000,8000000,0.28],
+  [8000000,Infinity,0.32]
+];
+const CNPS_SALARIALE_TAUX=0.063;
+const CNPS_PATRONALE_TAUX=0.155;
+const CFCE_TAUX=0.028;
+
+function itsSurBrut(brut){
+  let its=0;
+  for(const [lo,hi,taux] of ITS_BAREME_CI){
+    if(brut>lo) its+=(Math.min(brut,hi)-lo)*taux;
+  }
+  return its;
+}
+function netDepuisBrut(brut){
+  return brut - itsSurBrut(brut) - brut*CNPS_SALARIALE_TAUX;
+}
+// Le salaire saisi par l'entrepreneur est le NET versé — on retrouve le brut correspondant par
+// approximations successives (l'ITS étant progressif, il n'y a pas de formule directe simple).
+function brutDepuisNet(net){
+  if(net<=0) return 0;
+  let lo=net, hi=net*2+2000000;
+  for(let i=0;i<60;i++){
+    const mid=(lo+hi)/2;
+    if(netDepuisBrut(mid)<net) lo=mid; else hi=mid;
+  }
+  return (lo+hi)/2;
+}
+// Calcule, à partir d'un salaire net mensuel, les 4 lignes que l'entreprise doit reverser en plus.
+function chargesSocialesDepuisNet(net){
+  const brut=brutDepuisNet(net);
+  return {
+    brut,
+    its: itsSurBrut(brut),
+    cnpsSalariale: brut*CNPS_SALARIALE_TAUX,
+    cnpsPatronale: brut*CNPS_PATRONALE_TAUX,
+    cfce: brut*CFCE_TAUX
+  };
+}
+
+// Un mois peut être "écrasé" par un vrai chiffre saisi par l'entrepreneur (ligne.overrides), qui
+// prend toujours le dessus sur le calcul automatique montant+croissance pour ce mois précis.
+function ligneMonthly(ligne){
+  return Array.from({length:MONTHS},(_,i)=>{
+    if(ligne.overrides && ligne.overrides[i]!==undefined) return ligne.overrides[i];
+    return Math.round((ligne.montant||0)*Math.pow(1+(ligne.croissance||0)/100,i));
+  });
+}
+// Pour une ligne "Salaires & charges sociales" (montant net mensuel avec sa propre croissance),
+// renvoie les 4 lignes fiscales dérivées, mois par mois.
+function chargesSocialesMonthly(ligne){
+  const netMonthly=ligneMonthly(ligne);
+  const its=[],cnpsSalariale=[],cnpsPatronale=[],cfce=[];
+  netMonthly.forEach(net=>{
+    const c=chargesSocialesDepuisNet(net);
+    its.push(Math.round(c.its)); cnpsSalariale.push(Math.round(c.cnpsSalariale));
+    cnpsPatronale.push(Math.round(c.cnpsPatronale)); cfce.push(Math.round(c.cfce));
+  });
+  return {its,cnpsSalariale,cnpsPatronale,cfce};
+}
+function lignesSalairesActives(){
+  return state.resultatMensuel.charges.filter(l=>l.catalogueKey==='Salaires & charges sociales' && (l.montant||0)>0);
+}
+
+// Agrège toutes les lignes de ventes et de charges par catégorie comptable, mois par mois.
+// C'est cette agrégation (invisible pour l'utilisateur) qui alimente les formules du compte de résultat.
+function resultatMensuelAgrege(){
+  const cats={ca:zeros(MONTHS),coutVentes:zeros(MONTHS),personnel:zeros(MONTHS),chargesExploitation:zeros(MONTHS),amortissements:zeros(MONTHS),interets:zeros(MONTHS)};
+  state.resultatMensuel.ventes.forEach(l=>{ const m=ligneMonthly(l); for(let i=0;i<MONTHS;i++) cats.ca[i]+=m[i]; });
+  state.resultatMensuel.charges.forEach(l=>{ const m=ligneMonthly(l); const cat=cats[l.categorie]?l.categorie:'chargesExploitation'; for(let i=0;i<MONTHS;i++) cats[cat][i]+=m[i]; });
+  // Charges sociales dérivées (ITS, CNPS salariale et patronale, CFCE) sur chaque ligne "Salaires &
+  // charges sociales" — le salaire saisi reste le net versé ; ces lignes s'ajoutent en plus.
+  lignesSalairesActives().forEach(l=>{
+    const c=chargesSocialesMonthly(l);
+    for(let i=0;i<MONTHS;i++) cats.personnel[i]+=c.its[i]+c.cnpsSalariale[i]+c.cnpsPatronale[i]+c.cfce[i];
+  });
+  return cats;
+}
+
+// TEE (Taxe d'État de l'Entreprenant) — Côte d'Ivoire : remplace l'impôt sur les sociétés classique
+// pour les entreprises dont le chiffre d'affaires annuel TTC est entre 5 000 001 et 50 000 000 FCFA.
+// Se calcule sur le CA (pas sur le bénéfice), même en cas de perte — 4% pour le commerce/négoce,
+// 5% pour les autres activités. Vérifié auprès de la DGI (dgi.gouv.ci), sept. 2026.
+const TEE_SEUIL_MIN=5000001, TEE_SEUIL_MAX=50000000;
+function teeApplicable(caAnnuel){ return caAnnuel>=TEE_SEUIL_MIN && caAnnuel<=TEE_SEUIL_MAX; }
+function teeTaux(secteur){ return secteur==='Commerce / Boutique' ? 0.04 : 0.05; }
+function teeAnnuelle(caAnnuel,secteur){ return teeApplicable(caAnnuel) ? caAnnuel*teeTaux(secteur) : null; }
+
+// Compte de résultat mensuel (Année 1, module gratuit). Mêmes formules que la version annuelle,
+// appliquées mois par mois — la fiscalité est ici une estimation lissée sur chaque mois.
+function resultatMensuelCalc(){
+  const r=resultatMensuelAgrege(), out={};
+  ['ebe','rex','rfin','rai','is','rn'].forEach(k=>out[k]=zeros(MONTHS));
+  const caAnnuel=r.ca.reduce((a,b)=>a+b,0);
+  const teeAnnuel=teeAnnuelle(caAnnuel, state.fiche.secteur);
+  for(let m=0;m<MONTHS;m++){
+    const ebe=r.ca[m] - r.coutVentes[m] - r.personnel[m] - r.chargesExploitation[m];
+    const rex=ebe - r.amortissements[m];
+    const rfin=-r.interets[m];
+    const rai=rex+rfin;
+    const is=teeAnnuel!==null ? teeAnnuel/MONTHS : Math.max(0,rai)*(state.resultat.tauxIS/100);
+    const rn=rai-is;
+    out.ebe[m]=ebe; out.rex[m]=rex; out.rfin[m]=rfin; out.rai[m]=rai; out.is[m]=is; out.rn[m]=rn;
+  }
+  out.categories=r;
+  return out;
+}
+
+// L'Année 1 du compte de résultat sur 5 ans n'est jamais ressaisie : elle est la somme des 12 mois
+// du module gratuit. Les années 2 à 5 restent pilotées par le taux de croissance annuel.
+function syncYear1FromMensuel(){
+  const r=resultatMensuelAgrege();
+  RESULTAT_KEYS.forEach(k=>{
+    state.resultat[k][0] = r[k].reduce((a,b)=>a+b,0);
+  });
+}
+
+// Trois scénarios : Année 1 (votre plan réel, saisi à l'Étape II) ne change jamais. Seules les
+// années 2 à 5 sont ajustées par un multiplicateur — Prudent réduit le CA et augmente légèrement
+// les charges, Ambitieux fait l'inverse. Valeurs modifiables ici si besoin.
+const SCENARIO_MULTIPLIERS={
+  prudent:{ca:0.90, charges:1.05},
+  realiste:{ca:1, charges:1},
+  ambitieux:{ca:1.10, charges:0.97}
+};
+const SCENARIO_LABELS={prudent:'Prudent', realiste:'Réaliste', ambitieux:'Ambitieux'};
+let currentScenario='realiste';
+
+// Renvoie une copie ajustée des postes du compte de résultat 5 ans pour le scénario demandé —
+// ne modifie jamais les valeurs réellement saisies par l'utilisateur (state.resultat).
+function scenarioAdjustedResultat(scenario){
+  scenario = scenario || currentScenario;
+  const mult = SCENARIO_MULTIPLIERS[scenario] || SCENARIO_MULTIPLIERS.realiste;
+  const out={};
+  RESULTAT_KEYS.forEach(k=>{
+    out[k]=state.resultat[k].map((v,y)=> y===0 ? v : (k==='ca' ? v*mult.ca : v*mult.charges));
+  });
+  return out;
+}
+
+function resultatYearly(scenario){
+  syncYear1FromMensuel();
+  const r=scenarioAdjustedResultat(scenario), out={};
+  ['ebe','rex','rfin','rai','is','rn'].forEach(k=>out[k]=zeros(YEARS));
+  for(let y=0;y<YEARS;y++){
+    const ebe=r.ca[y] - r.coutVentes[y] - r.personnel[y] - r.chargesExploitation[y];
+    const rex=ebe - r.amortissements[y];
+    const rfin=-r.interets[y];
+    const rai=rex+rfin;
+    const teeAnnuel=teeAnnuelle(r.ca[y], state.fiche.secteur);
+    const is=teeAnnuel!==null ? teeAnnuel : Math.max(0,rai)*(state.resultat.tauxIS/100);
+    const rn=rai-is;
+    out.ebe[y]=ebe; out.rex[y]=rex; out.rfin[y]=rfin; out.rai[y]=rai; out.is[y]=is; out.rn[y]=rn;
+  }
+  out.ca=r.ca; out.amortissements=r.amortissements;
+  return out;
+}
+
+// Le bilan n'est jamais saisi à la main : il est entièrement reconstruit à partir des modules
+// Compte de Résultat, Plan de Trésorerie et Plan de Financement déjà remplis par l'utilisateur.
+function bilanYearly(scenario){
+  const res=resultatYearly(scenario);
+  const {cumule}=tresoMonthlyTotals();
+  const investissements=state.financement.besoins.investissements;
+  const bfrDepart=state.financement.besoins.bfrDemarrage;
+  const remboursementAnnuel = state.fiche.montant>0 ? state.fiche.montant/Math.max(1,state.fiche.duree/12) : 0;
+  // Les apports et financements (Étape II) sont un vrai apport du propriétaire s'ils ne sont pas
+  // explicitement un emprunt déjà reçu — sinon la Trésorerie (Actif) les intègre mais rien ne les
+  // équilibre au Passif. Simplification : on les traite tous comme du Capital, sauf mention claire
+  // d'un emprunt/prêt bancaire dans le libellé.
+  const apportsCapital = state.resultatMensuel.apports.reduce((sum,l)=>{
+    const lbl=(l.label||'').toLowerCase();
+    if(/emprunt|pr[eê]t\s*banc/.test(lbl)) return sum;
+    return sum + tresoLigneMonthly('apports',l).reduce((a,b)=>a+b,0);
+  },0);
+
+  const immob=zeros(YEARS), bfr=zeros(YEARS), treso=zeros(YEARS), dette=zeros(YEARS), reserves=zeros(YEARS);
+  let detteRestante=state.fiche.montant, reserveCum=0, immobRestant=investissements;
+  const ca1=res.ca[0]||0;
+  // L'Année 1 doit refléter ce qui a réellement été remboursé dans la Trésorerie (Étape V), pas une
+  // formule théorique déconnectée — sinon la dette peut "disparaître" du Bilan sans que l'argent
+  // correspondant n'ait vraiment quitté la trésorerie, ce qui déséquilibre tout.
+  const remboursementReelAn1 = state.treso.remboursement.reduce((a,b)=>a+b,0);
+
+  for(let y=0;y<YEARS;y++){
+    immobRestant=Math.max(0, immobRestant - res.amortissements[y]);
+    immob[y]=immobRestant;
+    // Le BFR évolue proportionnellement au chiffre d'affaires (méthode simplifiée standard des business plans).
+    bfr[y]= ca1>0 ? bfrDepart*((res.ca[y]||0)/ca1) : bfrDepart;
+
+    if(y===0){
+      treso[y]=cumule[MONTHS-1];
+      detteRestante=Math.max(0,detteRestante-remboursementReelAn1);
+    } else {
+      const deltaBfr=bfr[y]-bfr[y-1];
+      treso[y]=treso[y-1]+res.rn[y]+res.amortissements[y]-Math.min(remboursementAnnuel,detteRestante)-deltaBfr;
+      detteRestante=Math.max(0,detteRestante-remboursementAnnuel);
+    }
+    dette[y]=detteRestante;
+    reserveCum+=res.rn[y];
+    reserves[y]=reserveCum;
+  }
+  const actif=zeros(YEARS), passif=zeros(YEARS);
+  for(let y=0;y<YEARS;y++){
+    actif[y]=immob[y]+bfr[y]+treso[y];
+    // L'argent mis de côté avant de démarrer, et les apports/financements déclarés, sont de vrais
+    // apports du propriétaire — ils doivent compter comme du Capital au Passif, sinon le Bilan ne
+    // s'équilibre jamais.
+    passif[y]=state.fiche.capital+state.fiche.tresoInit+apportsCapital+reserves[y]+dette[y];
+  }
+  return {immob,bfr,treso,dette,reserves,actif,passif,res,apportsEtCote:state.fiche.tresoInit+apportsCapital};
+}
+
+function financementTotals(){
+  const b=state.financement.besoins, r=state.financement.ressources;
+  const totBesoins=b.fraisEtablissement+b.investissements+b.bfrDemarrage;
+  const totRessources=state.fiche.apport+r.subventions+state.fiche.montant+r.autres;
+  return {totBesoins,totRessources,ecart:totRessources-totBesoins};
+}
+
+// Seuil de rentabilité (Année 1) : le chiffre d'affaires minimum à atteindre pour ne pas perdre
+// d'argent. Simplification pédagogique : le coût des ventes est considéré comme une charge
+// variable (elle suit les ventes), tout le reste (personnel, charges d'exploitation,
+// amortissements, intérêts) comme une charge fixe (elle ne change pas selon les ventes).
+function seuilRentabiliteCalc(){
+  syncYear1FromMensuel();
+  const ca=state.resultat.ca[0];
+  const cv=state.resultat.coutVentes[0];
+  const cf=state.resultat.personnel[0]+state.resultat.chargesExploitation[0]+state.resultat.amortissements[0]+state.resultat.interets[0];
+  const tauxMarge = ca>0 ? (ca-cv)/ca : 0;
+  const seuil = tauxMarge>0 ? cf/tauxMarge : null;
+  const pointMortJours = (seuil!==null && ca>0) ? Math.round((seuil/ca)*365) : null;
+  return {ca,cv,cf,tauxMarge,seuil,pointMortJours};
+}
+
+// Ratios financiers clés, année par année — ceux qu'une banque regarde pour juger la solidité
+// d'un dossier de crédit.
+function ratiosFinanciersCalc(scenario){
+  const b=bilanYearly(scenario);
+  const out=[];
+  for(let y=0;y<YEARS;y++){
+    const capitauxPropres=state.fiche.capital+b.reserves[y];
+    const autonomie = b.actif[y]>0 ? capitauxPropres/b.actif[y] : null;
+    const caf = b.res.rn[y]+b.res.amortissements[y];
+    const capaciteRemb = caf>0 ? b.dette[y]/caf : null;
+    const rentabiliteNette = b.res.ca[y]>0 ? b.res.rn[y]/b.res.ca[y] : null;
+    const endettement = capitauxPropres>0 ? b.dette[y]/capitauxPropres : null;
+    out.push({autonomie,caf,capaciteRemb,rentabiliteNette,endettement});
+  }
+  return out;
+}
+
+// Classification automatique du projet — Niveau 1 (petit) / 2 (moyen) / 3 (gros).
+// Seuils modifiables ici librement (et exposables plus tard dans un espace admin sans
+// redévelopper l'application, comme demandé dans le cahier des charges).
+const CLASSIFICATION_SEUILS={
+  montant:{petit:2000000, gros:25000000},   // FCFA — montant total du projet (investissements + BFR de démarrage)
+  effectif:{petit:3, gros:15}                // nombre de personnes travaillant pour l'entreprise
+};
+function classificationProjetCalc(){
+  const fin=financementTotals();
+  const montantProjet = fin.totBesoins; // meilleure estimation disponible du "montant total du projet"
+  const effectif = state.fiche.effectif||0;
+
+  const niveauMontant = montantProjet<=0 ? 1
+    : montantProjet<CLASSIFICATION_SEUILS.montant.petit ? 1
+    : montantProjet>CLASSIFICATION_SEUILS.montant.gros ? 3
+    : 2;
+  const niveauEffectif = effectif<=CLASSIFICATION_SEUILS.effectif.petit ? 1
+    : effectif>CLASSIFICATION_SEUILS.effectif.gros ? 3
+    : 2;
+
+  // On retient le niveau le plus élevé des deux critères — approche prudente : un seul signal
+  // de "gros projet" suffit à demander plus de profondeur d'analyse.
+  const niveau = Math.max(niveauMontant, niveauEffectif);
+  const LABELS={1:'Petit projet',2:'Projet moyen',3:'Gros projet'};
+  const DESC={
+    1:"Parcours simplifié — les 7 modules actuels suffisent pour ce type de dossier.",
+    2:"Analyse plus détaillée recommandée — au-delà des 7 modules, un accompagnement conseiller peut affiner les hypothèses.",
+    3:"Étude complète recommandée — investissements, dette et scénarios méritent un accompagnement conseiller approfondi."
+  };
+  return {niveau, label:LABELS[niveau], description:DESC[niveau], montantProjet, effectif, niveauMontant, niveauEffectif};
+}
+
+// Diagnostic de finançabilité — un score /100 transparent (règles fixes, pas d'IA) qui reprend
+// tout ce qui est déjà calculé ailleurs dans le dossier. Les seuils sont des repères indicatifs
+// couramment utilisés en analyse de crédit, pas une norme bancaire universelle.
+function diagnosticFinancabiliteCalc(){
+  const r1=ratiosFinanciersCalc()[0];
+  const s=seuilRentabiliteCalc();
+  const {cumule}=tresoMonthlyTotals();
+  const fin=financementTotals();
+  const negMonths=cumule.map((v,i)=>v<0?i+1:null).filter(v=>v!==null);
+
+  const items=[]; // {dimension, points, max, alerte?}
+
+  // 1) Rentabilité nette Année 1 — 20 pts
+  let ptsRenta=0;
+  const rn=r1.rentabiliteNette;
+  if(rn===null){ ptsRenta=0; }
+  else if(rn>=0.15) ptsRenta=20;
+  else if(rn>=0.08) ptsRenta=15;
+  else if(rn>=0) ptsRenta=10;
+  else ptsRenta=0;
+  items.push({dimension:'Rentabilité',points:ptsRenta,max:20});
+  if(ptsRenta<=10){
+    items.push({alerte:true, text: rn===null||rn<0
+      ? "Votre résultat net prévu est négatif ou nul — revoyez vos ventes ou vos charges à l'Étape II avant de déposer ce dossier."
+      : "Votre rentabilité nette ("+fmt(rn*100)+"%) reste modeste — une banque appréciera de voir cette marge progresser sur les années suivantes."});
+  }
+
+  // 2) Trésorerie Année 1 — 20 pts
+  let ptsTreso=0;
+  if(negMonths.length===0) ptsTreso=20;
+  else if(negMonths.length<=2) ptsTreso=12;
+  else ptsTreso=5;
+  items.push({dimension:'Trésorerie',points:ptsTreso,max:20});
+  if(negMonths.length>0){
+    items.push({alerte:true, text:"Votre trésorerie devient négative en Mois "+negMonths.join(', ')+" — revoyez vos encaissements ou votre solde de départ (Étape V)."});
+  }
+
+  // 3) Apport personnel — 15 pts
+  const totalBesoin = state.fiche.apport + state.fiche.montant;
+  const apportPct = totalBesoin>0 ? state.fiche.apport/totalBesoin : 0;
+  let ptsApport=0;
+  if(apportPct>=0.30) ptsApport=15;
+  else if(apportPct>=0.15) ptsApport=10;
+  else if(apportPct>=0.05) ptsApport=5;
+  else ptsApport=0;
+  items.push({dimension:'Apport personnel',points:ptsApport,max:15});
+  if(ptsApport<=10){
+    items.push({alerte:true, text:"Votre apport personnel représente "+fmt(apportPct*100)+"% de votre besoin total — les banques apprécient généralement un apport autour de 20 à 30%."});
+  }
+
+  // 4) Endettement Année 1 — 15 pts
+  let ptsEndet=0;
+  const end=r1.endettement;
+  if(end===null) ptsEndet=15;
+  else if(end<=1) ptsEndet=15;
+  else if(end<=2) ptsEndet=10;
+  else if(end<=4) ptsEndet=5;
+  else ptsEndet=0;
+  items.push({dimension:'Endettement',points:ptsEndet,max:15});
+  if(ptsEndet<=5 && end!==null){
+    items.push({alerte:true, text:"Vos dettes représentent "+fmt(end*100)+"% de vos fonds propres — un niveau élevé qui peut freiner l'accord de la banque."});
+  }
+
+  // 5) Capacité de remboursement Année 1 — 15 pts
+  let ptsCapa=0;
+  const capa=r1.capaciteRemb;
+  if(capa===null) ptsCapa=0;
+  else if(capa<=3) ptsCapa=15;
+  else if(capa<=4) ptsCapa=10;
+  else if(capa<=6) ptsCapa=5;
+  else ptsCapa=0;
+  items.push({dimension:'Capacité de remboursement',points:ptsCapa,max:15});
+  if(ptsCapa<=10){
+    items.push({alerte:true, text: capa===null
+      ? "Impossible de calculer votre capacité de remboursement — vérifiez que votre résultat net et vos amortissements sont bien renseignés."
+      : "Il vous faudrait "+fmt(capa*10)/10+" ans pour rembourser vos dettes avec vos bénéfices — au-delà de 3-4 ans, c'est un point de vigilance pour la banque."});
+  }
+
+  // 6) Seuil de rentabilité — 15 pts
+  let ptsSeuil=0;
+  if(s.seuil===null || s.ca<=0){ ptsSeuil=0; }
+  else {
+    const marge=(s.ca-s.seuil)/s.seuil;
+    if(marge>=0.20) ptsSeuil=15;
+    else if(marge>=0) ptsSeuil=10;
+    else if(marge>=-0.20) ptsSeuil=5;
+    else ptsSeuil=0;
+  }
+  items.push({dimension:'Seuil de rentabilité',points:ptsSeuil,max:15});
+  if(ptsSeuil<=5){
+    items.push({alerte:true, text: (s.seuil===null||s.ca<=0)
+      ? "Impossible de calculer votre seuil de rentabilité — complétez vos ventes et charges à l'Étape II."
+      : "Votre chiffre d'affaires prévu n'atteint pas (ou de justesse) votre seuil de rentabilité — la marge de sécurité est faible."});
+  }
+
+  const totalPoints=items.filter(i=>!i.alerte).reduce((a,i)=>a+i.points,0);
+  const totalMax=items.filter(i=>!i.alerte).reduce((a,i)=>a+i.max,0);
+  const score = totalMax>0 ? Math.round((totalPoints/totalMax)*100) : 0;
+
+  let label, niveau;
+  if(score>=80){ label="Dossier solide"; niveau='ok'; }
+  else if(score>=60){ label="Projet à consolider"; niveau='ok'; }
+  else if(score>=40){ label="Projet fragile — accompagnement recommandé"; niveau='warn'; }
+  else { label="Dossier à retravailler"; niveau='warn'; }
+
+  const alertes=items.filter(i=>i.alerte).map(i=>i.text);
+  return {score, label, niveau, details:items.filter(i=>!i.alerte), alertes};
+}
+
+/* ---------- NAVIGATION ---------- */
+const TABS=[
+  {id:0,roman:'I',label:'Fiche Entreprise'},
+  {id:1,roman:'II',label:'Résultat 12 mois'},
+  {id:2,roman:'III',label:'Résultat 5 ans'},
+  {id:3,roman:'IV',label:'Bilan'},
+  {id:4,roman:'V',label:'Trésorerie'},
+  {id:5,roman:'VI',label:'Financement'},
+  {id:6,roman:'VII',label:'Synthèse'}
+];
+const FREE_TABS=[0,1]; // Fiche Entreprise et Compte de résultat 12 mois restent gratuits ; le reste nécessite un paiement
+let current=0;
+let pendingView=null;
+function isDone(id){
+  if(id===0) return !!state.fiche.nom && state.fiche.montant>0;
+  if(id===1) return state.resultatMensuel.ventes.some(l=>l.montant>0);
+  if(id===2) return state.resultat.ca.some(v=>v>0);
+  if(id===3) return state.financement.besoins.investissements>0||state.financement.besoins.bfrDemarrage>0;
+  if(id===4) return isDone(1); // la Trésorerie reprend automatiquement le Compte de résultat
+  if(id===5) return financementTotals().totBesoins>0;
+  return false;
+}
+function goToView(id){
+  if(id>0 && !isDone(0)){
+    current=0; renderAll();
+    showErr('ficheErr','Merci de renseigner au moins le nom de votre entreprise et le montant du crédit avant de continuer.');
+    return;
+  }
+  const locked = !(currentUser && currentUser.active);
+  const isLocked = locked && !FREE_TABS.includes(id);
+  if(isLocked){ pendingView=id; showPaywall(); return; }
+  current=id; renderAll();
+}
+function renderTabs(){
+  const nav=document.getElementById('tabs');
+  nav.innerHTML='';
+  const locked = !(currentUser && currentUser.active);
+  TABS.forEach(t=>{
+    const isLocked = locked && !FREE_TABS.includes(t.id);
+    const div=document.createElement('div');
+    div.className='tab'+(t.id===current?' active':'')+(isDone(t.id)?' done':'')+(isLocked?' locked':'');
+    div.innerHTML=`<span class="roman">${t.roman}</span><span class="label">${t.label}</span><span class="seal">${isLocked?'🔒':'✓'}</span>`;
+    div.onclick=()=>goToView(t.id);
+    nav.appendChild(div);
+  });
+  renderStepNav();
+  renderProgressBar();
+}
+function renderProgressBar(){
+  const fill=document.getElementById('progressFill');
+  const label=document.getElementById('progressLabel');
+  if(!fill) return;
+  const done=TABS.filter(t=>isDone(t.id)).length;
+  const pct=Math.round((done/TABS.length)*100);
+  fill.style.width=pct+'%';
+  label.textContent=done+'/'+TABS.length+' étapes complétées';
+}
+function renderStepNav(){
+  const prevBtn=document.getElementById('btnPrevStep');
+  const nextBtn=document.getElementById('btnNextStep');
+  const label=document.getElementById('stepNavLabel');
+  if(!prevBtn) return;
+  prevBtn.disabled = current<=0;
+  const isLast = current>=TABS.length-1;
+  nextBtn.textContent = isLast ? 'Terminé ✓' : 'Suivant →';
+  nextBtn.disabled = isLast;
+  label.textContent = TABS[current].roman+' / '+TABS[TABS.length-1].roman+' — '+TABS[current].label;
+}
+document.getElementById('btnPrevStep').addEventListener('click',()=>{ if(current>0) goToView(current-1); });
+document.getElementById('btnNextStep').addEventListener('click',()=>{ if(current<TABS.length-1) goToView(current+1); });
+function renderCtx(){
+  const el=document.getElementById('ctxBar');
+  if(state.fiche.nom){
+    el.innerHTML=`Dossier : <b>${escapeHtml(state.fiche.nom)}</b> — Crédit sollicité : <b>${fmt(state.fiche.montant)} FCFA</b>`;
+  } else {
+    el.innerHTML="Nouveau dossier — commencez par la <b>Fiche Entreprise</b>";
+  }
+}
+function escapeHtml(s){return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+/* ---------- BUILD TABLE HELPERS ---------- */
+function periodHeaders(n,prefix){let h='<tr><th>Poste</th>';for(let i=0;i<n;i++)h+=`<th>${prefix} ${i+1}</th>`;h+='<th>Total</th><th>Ça augmente ?</th></tr>';return h;}
+
+function buildTresoTable(){
+  const t=document.getElementById('tbl-treso');
+  document.getElementById('f_tresoInit2').value=state.fiche.tresoInit?fmt(state.fiche.tresoInit):'';
+  let h='<thead>'+periodHeaders(MONTHS,'M').replace('<th>Ça augmente ?</th>','')+'</thead><tbody>';
+  h+=sectionRow("Encaissements — reprend vos ventes du Compte de résultat, ajustez si l'argent rentre à un autre moment");
+  state.resultatMensuel.ventes.forEach(l=>h+=editableTresoRow(l,'ventes'));
+  if(state.resultatMensuel.apports.length){
+    state.resultatMensuel.apports.forEach(l=>h+=editableTresoRow(l,'apports'));
+  }
+  const {encTot,decTot,solde,cumule}=tresoMonthlyTotals();
+  h+=computedRow("Total encaissements",encTot,false);
+  h+=sectionRow("Décaissements — reprend vos charges du Compte de résultat, ajustez si l'argent sort à un autre moment");
+  state.resultatMensuel.charges.forEach(l=>{
+    h+=editableTresoRow(l,'charges');
+    if(l.catalogueKey==='Salaires & charges sociales' && (l.montant||0)>0){
+      const c=chargesSocialesMonthly(l);
+      h+=computedRowSimple('↳ ITS (estimation)', c.its);
+      h+=computedRowSimple('↳ CNPS salariale (estimation)', c.cnpsSalariale);
+      h+=computedRowSimple('↳ CNPS patronale (estimation)', c.cnpsPatronale);
+      h+=computedRowSimple('↳ CFCE (estimation)', c.cfce);
+    }
+  });
+  h+=simpleTresoRow('remboursement',"Remboursement de capital de votre emprunt",state.treso.remboursement);
+  h+=computedRow("Total décaissements",decTot,false);
+  h+=computedRow("Solde du mois",solde,true,'total');
+  h+=computedRow("Solde cumulé",cumule,true,'total result');
+  h+='</tbody>';
+  t.innerHTML=h;
+  wireEditableTresoRows();
+  wireSimpleTresoRows();
+
+  const negMonths=[];
+  cumule.forEach((v,i)=>{ if(v<0) negMonths.push('Mois '+(i+1)); });
+  const alertBox=document.getElementById('tresoAlert');
+  if(negMonths.length){
+    alertBox.innerHTML=`<div class="status-bar warn">⚠️ Attention, l'argent manquera en : ${negMonths.join(', ')}. Revoyez vos montants avant de continuer.</div>`;
+  } else {
+    alertBox.innerHTML=`<div class="status-bar ok">✓ Vous aurez toujours assez d'argent, mois après mois. Très bon signe.</div>`;
+  }
+  drawTresoChart(encTot,decTot,cumule);
+}
+// Une ligne de vente ou de charge, reprise automatiquement du Compte de résultat mois par mois,
+// mais modifiable indépendamment (l'argent peut rentrer/sortir à un moment différent de la vente
+// ou de la charge elle-même — un client qui paie avec 30 jours de retard, par exemple).
+function editableTresoRow(ligne,group){
+  const override=state.treso[group][ligne.id];
+  const arr=tresoLigneMonthly(group,ligne);
+  const hasOverrides=override && Object.keys(override).length>0;
+  let h=`<tr data-treso-ligne-id="${ligne.id}" data-treso-group="${group}"><td>${escapeHtml(ligne.label)}${hasOverrides?' <button type="button" class="row-reset" data-treso-reset-id="'+ligne.id+'" data-treso-reset-group="'+group+'" title="Revenir au calcul automatique (Compte de résultat) pour toute la ligne">↺</button>':''}</td>`;
+  let tot=0;
+  arr.forEach((v,i)=>{
+    tot+=v;
+    const isOverride=override && override[i]!==undefined;
+    h+=`<td class="num-cell"><input type="text" inputmode="numeric" class="month-input treso-input${isOverride?' overridden':''}" data-month="${i}" value="${fmt(v)}" title="${isOverride?'Ajusté à la main — videz la case pour reprendre le Compte de résultat':'Reprend automatiquement le Compte de résultat — modifiez si besoin'}"></td>`;
+  });
+  const c=tot<0?'neg':(tot>0?'pos':'');
+  h+=`<td class="num-cell ${c}">${fmt(tot)}</td></tr>`;
+  return h;
+}
+// Une ligne propre à la Trésorerie (apports personnels, emprunt reçu, remboursement de capital) —
+// n'existe pas dans le Compte de résultat, donc pas de valeur par défaut à reprendre.
+function simpleTresoRow(key,label,arr){
+  let h=`<tr><td>${label}</td>`;
+  let tot=0;
+  arr.forEach((v,i)=>{
+    tot+=v;
+    h+=`<td class="num-cell"><input type="text" inputmode="numeric" class="treso-simple-input" data-key="${key}" data-month="${i}" value="${v?fmt(v):''}" placeholder="0"></td>`;
+  });
+  const c=tot<0?'neg':(tot>0?'pos':'');
+  h+=`<td class="num-cell ${c}">${fmt(tot)}</td></tr>`;
+  return h;
+}
+function wireEditableTresoRows(){
+  document.querySelectorAll('#tbl-treso .treso-input').forEach(inp=>{
+    inp.addEventListener('change',e=>{
+      const row=e.target.closest('tr');
+      const group=row.dataset.tresoGroup, id=row.dataset.tresoLigneId;
+      const ligne=state.resultatMensuel[group].find(l=>l.id===id);
+      if(!ligne) return;
+      const month=parseInt(e.target.dataset.month,10);
+      const raw=e.target.value.trim();
+      if(!state.treso[group][id]) state.treso[group][id]={};
+      if(raw===''){
+        delete state.treso[group][id][month];
+      } else {
+        state.treso[group][id][month]=num(raw);
+      }
+      if(Object.keys(state.treso[group][id]).length===0) delete state.treso[group][id];
+      renderAll();
+    });
+  });
+  document.querySelectorAll('#tbl-treso .row-reset[data-treso-reset-id]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      delete state.treso[btn.dataset.tresoResetGroup][btn.dataset.tresoResetId];
+      renderAll();
+    });
+  });
+}
+function wireSimpleTresoRows(){
+  document.querySelectorAll('#tbl-treso .treso-simple-input').forEach(inp=>{
+    inp.addEventListener('input',e=>{
+      const key=e.target.dataset.key, month=parseInt(e.target.dataset.month,10);
+      state.treso[key][month]=num(e.target.value);
+      renderAll(true,e.target);
+    });
+  });
+}
+function sectionRow(label){return `<tr class="row-section"><td colspan="99">${label}</td></tr>`;}
+function dataRow(group,key,label,arr,withGrowth){
+  let h=`<tr><td>${label}</td>`;
+  let tot=0;
+  arr.forEach((v,i)=>{tot+=v;h+=`<td><input type="text" inputmode="numeric" data-money data-group="${group}" data-key="${key}" data-i="${i}" value="${v?fmt(v):''}" placeholder="0"></td>`;});
+  h+=`<td class="num-cell">${fmt(tot)}</td>`;
+  h+= withGrowth ? `<td><input class="growth" type="number" step="1" data-growth="${key}" data-growthgroup="treso" value="${state.treso.growth[key]||''}" placeholder="%"></td>` : '<td></td>';
+  h+='</tr>';
+  return h;
+}
+function computedRow(label,arr,colorize,cls){
+  let h=`<tr class="${cls||''}"><td>${label}</td>`;
+  let tot=0;
+  arr.forEach(v=>{tot+=v;const c=colorize?(v<0?'neg':(v>0?'pos':'')):'';h+=`<td class="num-cell ${c}">${fmt(v)}</td>`;});
+  const c=colorize?(tot<0?'neg':(tot>0?'pos':'')):'';
+  h+=`<td class="num-cell ${c}">${fmt(tot)}</td><td></td></tr>`;
+  return h;
+}
+
+let tresoChart=null;
+// Si la bibliothèque de graphiques n'a pas pu se charger (réseau, bloqueur...) ou échoue à
+// s'afficher, on montre un message clair au lieu de laisser un cadre vide sans explication.
+function chartFallback(canvasId){
+  const ctx=document.getElementById(canvasId);
+  if(!ctx) return;
+  const wrap=ctx.parentElement;
+  wrap.innerHTML='<div style="height:100%;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--ink-soft);font-size:12.5px;padding:20px;">Graphique indisponible pour le moment (connexion internet nécessaire pour l\'afficher). Les chiffres restent corrects dans le tableau ci-dessus.</div>';
+}
+
+function drawTresoChart(encTot,decTot,cumule){
+  const ctx=document.getElementById('tresoChart');
+  if(!ctx) return;
+  try{
+    if(typeof Chart==='undefined') throw new Error('Chart.js non chargé');
+    if(tresoChart) tresoChart.destroy();
+    tresoChart=new Chart(ctx,{
+      data:{
+        labels:Array.from({length:MONTHS},(_,i)=>'M'+(i+1)),
+        datasets:[
+          {type:'bar',label:'Encaissements',data:encTot,backgroundColor:'#2F684455'},
+          {type:'bar',label:'Décaissements',data:decTot,backgroundColor:'#A8362B55'},
+          {type:'line',label:'Solde cumulé',data:cumule,borderColor:'#C9A227',backgroundColor:'#C9A227',tension:.25,pointRadius:3,yAxisID:'y'}
+        ]
+      },
+      options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{boxWidth:12,font:{size:11}}}},scales:{y:{ticks:{callback:v=>fmt(v)}}}}
+    });
+  }catch(err){ console.error('Graphique trésorerie indisponible:',err); chartFallback('tresoChart'); }
+}
+
+let ligneUidCounter=0;
+function uid(){ ligneUidCounter++; return 'l'+Date.now().toString(36)+ligneUidCounter; }
+
+function buildResultatMensuelTable(){
+  renderLignesList('ventes');
+  renderLignesList('apports');
+  renderLignesList('charges');
+  renderChargesCatalogue();
+
+  const t=document.getElementById('tbl-resultat-mensuel');
+  const rm=resultatMensuelCalc();
+  let h='<thead>'+periodHeaders(MONTHS,'M').replace('<th>Ça augmente ?</th>','')+'</thead><tbody>';
+  if(state.resultatMensuel.ventes.length){
+    h+=sectionRow('Vos ventes');
+    state.resultatMensuel.ventes.forEach(l=>h+=editableMonthRow(l,'ventes'));
+  }
+  h+=computedRowSimple("Chiffre d'affaires total",rm.categories.ca,'total');
+  if(state.resultatMensuel.apports.length){
+    h+=sectionRow('Vos apports et financements — jamais compté dans le Chiffre d\'affaires ci-dessus');
+    const apportsArr=zeros(MONTHS);
+    state.resultatMensuel.apports.forEach(l=>{
+      h+=editableMonthRow(l,'apports');
+      ligneMonthly(l).forEach((v,i)=>apportsArr[i]+=v);
+    });
+    h+=computedRowSimple("Total apports et financements",apportsArr,'total');
+  }
+  if(state.resultatMensuel.charges.length){
+    h+=sectionRow('Vos charges');
+    state.resultatMensuel.charges.forEach(l=>{
+      h+=editableMonthRow(l,'charges');
+      if(l.catalogueKey==='Salaires & charges sociales' && (l.montant||0)>0){
+        const c=chargesSocialesMonthly(l);
+        h+=computedRowSimple('↳ ITS (estimation)', c.its);
+        h+=computedRowSimple('↳ CNPS salariale (estimation)', c.cnpsSalariale);
+        h+=computedRowSimple('↳ CNPS patronale (estimation)', c.cnpsPatronale);
+        h+=computedRowSimple('↳ CFCE (estimation)', c.cfce);
+      }
+    });
+  }
+  h+=computedRowSimple("Excédent brut d'exploitation (EBE)",rm.ebe);
+  h+=computedRowSimple("Résultat d'exploitation",rm.rex);
+  h+=computedRowSimple("Résultat net",rm.rn,'total result');
+  h+='</tbody>';
+  t.innerHTML=h;
+  wireEditableMonthRows();
+  drawResultatMensuelChart(rm);
+}
+// Une ligne (vente ou charge) affichée mois par mois, avec chaque cellule modifiable directement :
+// l'entrepreneur peut noter son vrai chiffre pour un mois précis plutôt que de garder la valeur
+// calculée à partir de "montant de départ + % de croissance". Un bouton ↺ par ligne efface tous les
+// chiffres saisis à la main pour cette ligne et revient au calcul automatique.
+function editableMonthRow(ligne,type){
+  const arr=ligneMonthly(ligne);
+  const hasOverrides=ligne.overrides && Object.keys(ligne.overrides).length>0;
+  let h=`<tr data-ligne-id="${ligne.id}" data-ligne-type="${type}"><td>${escapeHtml(ligne.label)}${hasOverrides?' <button type="button" class="row-reset" data-reset-id="'+ligne.id+'" data-reset-type="'+type+'" title="Revenir au calcul automatique pour cette ligne">↺</button>':''}</td>`;
+  let tot=0;
+  arr.forEach((v,i)=>{
+    tot+=v;
+    const isOverride=ligne.overrides && ligne.overrides[i]!==undefined;
+    h+=`<td class="num-cell"><input type="text" inputmode="numeric" class="month-input${isOverride?' overridden':''}" data-month="${i}" value="${fmt(v)}" title="${isOverride?'Chiffre réel saisi — cliquez sur ↺ pour revenir au calcul automatique':'Valeur calculée automatiquement — modifiez pour noter votre vrai chiffre'}"></td>`;
+  });
+  const c=tot<0?'neg':(tot>0?'pos':'');
+  h+=`<td class="num-cell ${c}">${fmt(tot)}</td></tr>`;
+  return h;
+}
+function wireEditableMonthRows(){
+  document.querySelectorAll('#tbl-resultat-mensuel .month-input').forEach(inp=>{
+    inp.addEventListener('change',e=>{
+      const row=e.target.closest('tr');
+      const type=row.dataset.ligneType, id=row.dataset.ligneId;
+      const ligne=state.resultatMensuel[type].find(l=>l.id===id);
+      if(!ligne) return;
+      const month=parseInt(e.target.dataset.month,10);
+      const raw=e.target.value.trim();
+      if(!ligne.overrides) ligne.overrides={};
+      if(raw===''){
+        delete ligne.overrides[month]; // champ vidé : revient au calcul automatique pour ce mois
+      } else {
+        ligne.overrides[month]=num(raw);
+      }
+      if(Object.keys(ligne.overrides).length===0) delete ligne.overrides;
+      renderAll();
+    });
+  });
+  document.querySelectorAll('#tbl-resultat-mensuel .row-reset').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const ligne=state.resultatMensuel[btn.dataset.resetType].find(l=>l.id===btn.dataset.resetId);
+      if(ligne) delete ligne.overrides;
+      renderAll();
+    });
+  });
+}
+// Variante de computedRow sans la colonne "Variation/mois" (celle-ci n'existe plus dans ce module),
+// avec un total annuel dans la dernière colonne.
+function computedRowSimple(label,arr,cls){
+  let h=`<tr class="${cls||''}"><td>${label}</td>`;
+  let tot=0;
+  arr.forEach(v=>{tot+=v;const c=v<0?'neg':(v>0?'pos':'');h+=`<td class="num-cell ${c}">${fmt(v)}</td>`;});
+  const c=tot<0?'neg':(tot>0?'pos':'');
+  h+=`<td class="num-cell ${c}">${fmt(tot)}</td></tr>`;
+  return h;
+}
+
+function renderLignesList(type){
+  const boxIds={ventes:'ventesList',apports:'apportsList',charges:'chargesList'};
+  const box=document.getElementById(boxIds[type]);
+  const lignes=state.resultatMensuel[type];
+  const emptyMsg={ventes:"Aucune source de revenu ajoutée pour le moment.",apports:"Aucun apport ou financement déclaré pour le moment.",charges:"Aucune charge ajoutée pour le moment — piochez dans la liste ci-dessous."};
+  if(!lignes.length){
+    box.innerHTML=`<div class="ligne-empty">${emptyMsg[type]}</div>`;
+    return;
+  }
+  box.innerHTML=lignes.map(l=>`
+    <div class="ligne-row" data-type="${type}" data-id="${l.id}">
+      <input class="ligne-label" type="text" data-field="label" value="${escapeHtml(l.label)}">
+      <div class="ligne-amounts">
+        <div class="ligne-field"><label>Combien par mois ?</label><input type="text" inputmode="numeric" data-money data-field="montant" value="${l.montant?fmt(l.montant):''}" placeholder="Ex: 50 000"></div>
+        <div class="ligne-field"><label>Ça augmente ? (facultatif)</label><input type="number" step="1" data-field="croissance" value="${l.croissance||''}" placeholder="0 = pareil"></div>
+      </div>
+      <button class="ligne-del" data-action="remove" title="Retirer">✕</button>
+    </div>`).join('');
+  box.querySelectorAll('input[data-field]').forEach(inp=>{
+    inp.addEventListener('input',e=>{
+      const row=e.target.closest('.ligne-row');
+      const ligne=state.resultatMensuel[type].find(l=>l.id===row.dataset.id);
+      if(!ligne) return;
+      const field=e.target.dataset.field;
+      ligne[field]= field==='label' ? e.target.value : num(e.target.value);
+      renderAll();
+      // Remet le focus sur le champ édité après le re-rendu.
+      const again=document.querySelector(`.ligne-row[data-id="${row.dataset.id}"] input[data-field="${field}"]`);
+      if(again){ again.focus(); const p=again.value.length; again.setSelectionRange(p,p); }
+    });
+  });
+  box.querySelectorAll('.ligne-del').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const row=btn.closest('.ligne-row');
+      state.resultatMensuel[type]=state.resultatMensuel[type].filter(l=>l.id!==row.dataset.id);
+      renderAll();
+    });
+  });
+}
+
+function renderChargesCatalogue(){
+  const box=document.getElementById('chargesCatalogue');
+  const used=new Set(state.resultatMensuel.charges.map(l=>l.catalogueKey).filter(Boolean));
+  const remaining=CHARGES_CATALOGUE.filter(([label])=>!used.has(label));
+  if(!remaining.length){
+    box.innerHTML='<span class="note" style="margin:0;">Toutes les charges courantes ont été ajoutées.</span>';
+    return;
+  }
+  box.innerHTML=remaining.map(([label])=>`<button type="button" class="chip" data-label="${escapeHtml(label)}">${label}</button>`).join('');
+  box.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click',()=>{
+      const label=chip.dataset.label;
+      const entry=CHARGES_CATALOGUE.find(([l])=>l===label);
+      state.resultatMensuel.charges.push({id:uid(),label,categorie:entry[1],montant:0,croissance:0,catalogueKey:label});
+      renderAll();
+    });
+  });
+}
+
+document.getElementById('btnAddVente').addEventListener('click',()=>{
+  const input=document.getElementById('ventesCustomInput');
+  const label=input.value.trim()||'Autre source de revenu';
+  state.resultatMensuel.ventes.push({id:uid(),label,montant:0,croissance:0});
+  input.value='';
+  renderAll();
+});
+document.getElementById('btnAddApport').addEventListener('click',()=>{
+  const input=document.getElementById('apportsCustomInput');
+  const label=input.value.trim()||'Apport ou financement';
+  state.resultatMensuel.apports.push({id:uid(),label,montant:0,croissance:0});
+  input.value='';
+  renderAll();
+});
+document.getElementById('btnAddCharge').addEventListener('click',()=>{
+  const input=document.getElementById('chargesCustomInput');
+  const label=input.value.trim();
+  if(!label) return;
+  state.resultatMensuel.charges.push({id:uid(),label,categorie:'chargesExploitation',montant:0,croissance:0,catalogueKey:null});
+  input.value='';
+  renderAll();
+});
+
+let resultatMensuelChart=null;
+function drawResultatMensuelChart(rm){
+  const ctx=document.getElementById('resultatMensuelChart');
+  if(!ctx) return;
+  try{
+    if(typeof Chart==='undefined') throw new Error('Chart.js non chargé');
+    if(resultatMensuelChart) resultatMensuelChart.destroy();
+    resultatMensuelChart=new Chart(ctx,{
+      data:{
+        labels:Array.from({length:MONTHS},(_,i)=>'M'+(i+1)),
+        datasets:[
+          {type:'bar',label:"Chiffre d'affaires",data:rm.categories.ca,backgroundColor:'#0A1B3D99'},
+          {type:'line',label:'Résultat net',data:rm.rn,borderColor:'#C9A227',backgroundColor:'#C9A227',tension:.25,pointRadius:3}
+        ]
+      },
+      options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{boxWidth:12,font:{size:11}}}},scales:{y:{ticks:{callback:v=>fmt(v)}}}}
+    });
+  }catch(err){ console.error('Graphique résultat 12 mois indisponible:',err); chartFallback('resultatMensuelChart'); }
+}
+
+function buildResultatTable(){
+  const t=document.getElementById('tbl-resultat');
+  let h='<thead><tr><th>Poste</th>';for(let i=0;i<YEARS;i++)h+=`<th>Année ${i+1}</th>`;h+='<th>Croiss. %/an</th></tr></thead><tbody>';
+  h+=sectionRow5("Produits");
+  RES_PROD.forEach(([k,label])=>h+=dataRow5(k,label));
+  h+=sectionRow5("Charges");
+  RES_CHARGE.forEach(([k,label])=>h+=dataRow5(k,label));
+  const r=resultatYearly();
+  h+=computedRow5("Excédent brut d'exploitation (EBE)",r.ebe);
+  h+=computedRow5("Résultat d'exploitation",r.rex);
+  h+=computedRow5("Résultat financier",r.rfin);
+  h+=computedRow5("Résultat avant impôt",r.rai);
+  h+=computedRow5("Fiscalité (Impôt sur les sociétés)",r.is);
+  h+=computedRow5("Résultat net",r.rn,'total result');
+  h+='</tbody>';
+  t.innerHTML=h;
+  attachInputs(t);
+  attachGrowth(t,'resultat');
+  document.getElementById('r_tauxIS').value=state.resultat.tauxIS;
+  const teeNote=document.getElementById('tee_note');
+  if(teeApplicable(r.ca[0])){
+    const taux=Math.round(teeTaux(state.fiche.secteur)*100);
+    teeNote.classList.remove('hidden');
+    teeNote.innerHTML=`📋 Votre chiffre d'affaires (${fmt(r.ca[0])} FCFA/an) vous place dans la <b>Taxe d'État de l'Entreprenant (TEE)</b> — elle remplace l'impôt sur les sociétés classique pour les CA entre 5 000 001 et 50 000 000 FCFA. Calculée automatiquement à ${taux}% de votre chiffre d'affaires (le champ ci-dessus n'est plus utilisé tant que vous restez dans cette tranche).`;
+  } else {
+    teeNote.classList.add('hidden');
+  }
+  drawResultatChart(r);
+}
+function sectionRow5(label){return `<tr class="row-section"><td colspan="99">${label}</td></tr>`;}
+function dataRow5(key,label){
+  const arr=state.resultat[key];
+  let h=`<tr><td>${label}</td>`;
+  arr.forEach((v,i)=>{
+    if(i===0) h+=`<td class="num-cell" title="Somme du Compte de résultat 12 mois">${fmt(v)}</td>`;
+    else h+=`<td><input type="text" inputmode="numeric" data-money data-group="resultat" data-key="${key}" data-i="${i}" value="${v?fmt(v):''}" placeholder="0"></td>`;
+  });
+  h+=`<td><input class="growth" type="number" step="1" data-growth="${key}" data-growthgroup="resultat" value="${state.resultat.growth[key]||''}" placeholder="%"></td></tr>`;
+  return h;
+}
+function computedRow5(label,arr,cls){
+  let h=`<tr class="${cls||''}"><td>${label}</td>`;
+  arr.forEach(v=>{const c=v<0?'neg':(v>0?'pos':'');h+=`<td class="num-cell ${c}">${fmt(v)}</td>`;});
+  h+='<td></td></tr>';
+  return h;
+}
+let resultatChart=null;
+function drawResultatChart(r){
+  const ctx=document.getElementById('resultatChart');
+  if(!ctx) return;
+  try{
+    if(typeof Chart==='undefined') throw new Error('Chart.js non chargé');
+    if(resultatChart) resultatChart.destroy();
+    resultatChart=new Chart(ctx,{
+      data:{
+        labels:Array.from({length:YEARS},(_,i)=>'Année '+(i+1)),
+        datasets:[
+          {type:'bar',label:"Chiffre d'affaires",data:state.resultat.ca,backgroundColor:'#0A1B3D99'},
+          {type:'line',label:'Résultat net',data:r.rn,borderColor:'#C9A227',backgroundColor:'#C9A227',tension:.25,pointRadius:3}
+        ]
+      },
+      options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{boxWidth:12,font:{size:11}}}},scales:{y:{ticks:{callback:v=>fmt(v)}}}}
+    });
+  }catch(err){ console.error('Graphique résultat 5 ans indisponible:',err); chartFallback('resultatChart'); }
+}
+function attachGrowth(t,group){
+  t.querySelectorAll('input[data-growth]').forEach(inp=>{
+    inp.addEventListener('change',e=>{
+      const key=e.target.dataset.growth;
+      const rate=num(e.target.value);
+      const arr=state.resultat[key];
+      state.resultat.growth[key]=rate;
+      const base=arr[0];
+      for(let i=1;i<arr.length;i++) arr[i]=Math.round(base*Math.pow(1+rate/100,i));
+      renderAll();
+    });
+  });
+}
+
+function buildBilanTable(){
+  const scenNote=document.getElementById('bilanScenarioNote');
+  if(scenNote) scenNote.textContent='Scénario affiché : '+SCENARIO_LABELS[currentScenario];
+  const b=bilanYearly();
+  const gap=zeros(YEARS).map((_,y)=>b.actif[y]-b.passif[y]);
+  const status=document.getElementById('bilanStatus');
+  const maxGap=Math.max(...gap.map(Math.abs));
+  status.innerHTML=`<div class="status-bar ${maxGap<1000?'ok':'warn'}">${maxGap<1000?"Bilan équilibré sur les 5 exercices — construit automatiquement à partir de vos réponses.":"Léger écart de cohérence détecté (normal avec un modèle simplifié) — max "+fmt(maxGap)+" FCFA entre votre plan de trésorerie et votre compte de résultat. Un conseiller peut affiner cela avec vous."}</div>`;
+
+  const t=document.getElementById('tbl-bilan');
+  let h='<thead><tr><th>Poste</th>';for(let i=0;i<YEARS;i++)h+=`<th>Année ${i+1}</th>`;h+='</tr></thead><tbody>';
+  h+=sectionRow5("ACTIF");
+  h+=computedRow5("Immobilisations nettes",b.immob);
+  h+=computedRow5("Besoin en fonds de roulement (BFR)",b.bfr);
+  h+=computedRow5("Trésorerie",b.treso);
+  h+=computedRow5("Total Actif",b.actif,'total');
+  h+=sectionRow5("PASSIF");
+  h+=computedRow5("Capital social",zeros(YEARS).map(()=>state.fiche.capital));
+  if(b.apportsEtCote>0){
+    h+=computedRow5("Apports et argent mis de côté avant de démarrer",zeros(YEARS).map(()=>b.apportsEtCote));
+  }
+  h+=computedRow5("Réserves (résultats cumulés)",b.reserves);
+  h+=computedRow5("Dettes financières (emprunt restant dû)",b.dette);
+  h+=computedRow5("Total Passif",b.passif,'total');
+  h+=computedRow5("Écart Actif − Passif",gap,'total result');
+  h+='</tbody>';
+  t.innerHTML=h;
+  drawBilanChart(b);
+}
+let bilanChart=null;
+function drawBilanChart(b){
+  const ctx=document.getElementById('bilanChart');
+  if(!ctx) return;
+  try{
+    if(typeof Chart==='undefined') throw new Error('Chart.js non chargé');
+    if(bilanChart) bilanChart.destroy();
+    bilanChart=new Chart(ctx,{
+      type:'bar',
+      data:{
+        labels:Array.from({length:YEARS},(_,i)=>'Année '+(i+1)),
+        datasets:[
+          {label:'Total Actif',data:b.actif,backgroundColor:'#0A1B3D99'},
+          {label:'Total Passif',data:b.passif,backgroundColor:'#C9A22799'}
+        ]
+      },
+      options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{boxWidth:12,font:{size:11}}}},scales:{y:{ticks:{callback:v=>fmt(v)}}}}
+    });
+  }catch(err){ console.error('Graphique bilan indisponible:',err); chartFallback('bilanChart'); }
+}
+
+function buildFinancementTables(){
+  const f=financementTotals();
+  const status=document.getElementById('financementStatus');
+  const ok=Math.abs(f.ecart)<1000;
+  status.innerHTML=`<div class="status-bar ${ok?'ok':'warn'}">${ok?"C'est équilibré : l'argent disponible couvre vos besoins.":(f.ecart<0? "Il manque "+fmtC(-f.ecart)+" pour couvrir vos besoins." : "Vous avez "+fmtC(f.ecart)+" de plus que nécessaire.")}</div>`;
+
+  let hb='<thead><tr><th>Poste</th><th>Montant</th></tr></thead><tbody>';
+  BESOINS.forEach(([k,label])=>{
+    hb+=`<tr><td>${label}</td><td><input type="text" inputmode="numeric" data-money data-group="financement.besoins" data-key="${k}" value="${state.financement.besoins[k]?fmt(state.financement.besoins[k]):''}" placeholder="0"></td></tr>`;
+  });
+  hb+=`<tr class="total"><td>Total Besoins</td><td class="num-cell">${fmt(f.totBesoins)}</td></tr></tbody>`;
+  document.getElementById('tbl-besoins').innerHTML=hb;
+
+  let hr='<thead><tr><th>Poste</th><th>Montant</th></tr></thead><tbody>';
+  hr+=`<tr><td>Votre argent personnel déjà investi</td><td class="num-cell">${fmt(state.fiche.apport)}</td></tr>`;
+  hr+=`<tr><td>Le crédit que vous demandez</td><td class="num-cell">${fmt(state.fiche.montant)}</td></tr>`;
+  hr+=`<tr><td>Aide ou subvention reçue (facultatif)</td><td><input type="text" inputmode="numeric" data-money data-group="financement.ressources" data-key="subventions" value="${state.financement.ressources.subventions?fmt(state.financement.ressources.subventions):''}" placeholder="0"></td></tr>`;
+  hr+=`<tr><td>Autre argent disponible (facultatif)</td><td><input type="text" inputmode="numeric" data-money data-group="financement.ressources" data-key="autres" value="${state.financement.ressources.autres?fmt(state.financement.ressources.autres):''}" placeholder="0"></td></tr>`;
+  hr+=`<tr class="total"><td>Total Ressources</td><td class="num-cell">${fmt(f.totRessources)}</td></tr></tbody>`;
+  document.getElementById('tbl-ressources').innerHTML=hr;
+
+  attachInputs(document.getElementById('tbl-besoins'));
+  attachInputs(document.getElementById('tbl-ressources'));
+}
+
+function buildSynthese(){
+  const scenNote=document.getElementById('syntheseScenarioNote');
+  if(scenNote) scenNote.textContent='Scénario affiché : '+SCENARIO_LABELS[currentScenario];
+  const {cumule}=tresoMonthlyTotals();
+  const b=bilanYearly();
+  const minCumule=Math.min(...cumule);
+  const kpis=[
+    {l:"CA Année 1",v:fmtC(state.resultat.ca[0])},
+    {l:"CA Année 5",v:fmtC(b.res.ca[4])},
+    {l:"Résultat net Année 1",v:fmtC(b.res.rn[0]), cls:b.res.rn[0]<0?'warn':'ok'},
+    {l:"Résultat net Année 5",v:fmtC(b.res.rn[4]), cls:b.res.rn[4]<0?'warn':'ok'},
+    {l:"Trésorerie min. Année 1",v:fmtC(minCumule), cls:minCumule<0?'warn':'ok'},
+    {l:"Trésorerie fin Année 1",v:fmtC(cumule[MONTHS-1])},
+    {l:"Crédit sollicité",v:fmtC(state.fiche.montant)},
+    {l:"Dette restante fin Année 5",v:fmtC(b.dette[4])},
+  ];
+  document.getElementById('kpis').innerHTML=kpis.map(k=>`<div class="kpi ${k.cls||''}"><div class="l">${k.l}</div><div class="v">${k.v}</div></div>`).join('');
+
+  buildClassif();
+  buildDiagnostic();
+  buildSeuilRentabilite();
+  buildRatiosFinanciers();
+}
+
+function buildClassif(){
+  const box=document.getElementById('classifBox');
+  if(!box) return;
+  const c=classificationProjetCalc();
+  box.innerHTML=`
+    <div class="diag-header">
+      <div class="diag-score" style="border-color:var(--navy);color:var(--navy);font-size:16px;">N${c.niveau}</div>
+      <div>
+        <div class="diag-label" style="color:var(--navy);">${c.label}</div>
+        <div class="note" style="margin:2px 0 0;">${c.description}</div>
+      </div>
+    </div>
+    <table class="ledger" style="margin-top:6px;">
+      <thead><tr><th>Critère</th><th>Votre projet</th><th>Niveau</th></tr></thead>
+      <tbody>
+        <tr><td>Montant total du projet</td><td class="num-cell">${fmtC(c.montantProjet)}</td><td class="num-cell">N${c.niveauMontant}</td></tr>
+        <tr><td>Effectif</td><td class="num-cell">${c.effectif} personne(s)</td><td class="num-cell">N${c.niveauEffectif}</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Classification indicative — le niveau retenu est le plus élevé des deux critères. Seuils : petit projet sous ${fmtC(CLASSIFICATION_SEUILS.montant.petit)} et ${CLASSIFICATION_SEUILS.effectif.petit} employé(s) max ; gros projet au-delà de ${fmtC(CLASSIFICATION_SEUILS.montant.gros)} ou plus de ${CLASSIFICATION_SEUILS.effectif.gros} employés.</p>`;
+}
+
+function buildDiagnostic(){
+  const box=document.getElementById('diagnosticBox');
+  if(!box) return;
+  const d=diagnosticFinancabiliteCalc();
+  const ringColor = d.niveau==='ok' ? 'var(--green)' : 'var(--red)';
+  box.innerHTML=`
+    <div class="diag-header">
+      <div class="diag-score" style="border-color:${ringColor};color:${ringColor};">${d.score}</div>
+      <div>
+        <div class="diag-label" style="color:${ringColor};">${d.label}</div>
+        <div class="note" style="margin:2px 0 0;">Score sur 100, calculé à partir de votre Année 1 : rentabilité, trésorerie, apport personnel, endettement, capacité de remboursement et seuil de rentabilité.</div>
+      </div>
+    </div>
+    ${d.alertes.length ? `<div class="diag-alerts">${d.alertes.map(a=>`<div class="status-bar warn">${a}</div>`).join('')}</div>` : `<div class="status-bar ok">Aucun point de vigilance majeur détecté sur ces six critères — bon signal avant de déposer ce dossier.</div>`}
+    <p class="note">Ce score est indicatif, basé sur des seuils courants en analyse de crédit — il ne remplace pas l'avis d'un banquier ou d'un conseiller.</p>`;
+}
+
+function buildSeuilRentabilite(){
+  const box=document.getElementById('seuilBox');
+  if(!box) return;
+  const s=seuilRentabiliteCalc();
+  if(s.seuil===null){
+    box.innerHTML=`<div class="status-bar warn">Impossible de calculer le seuil de rentabilité : vérifiez que votre chiffre d'affaires et vos charges (Étape II) sont bien remplis.</div>`;
+    return;
+  }
+  const depassement = s.ca - s.seuil;
+  const ok = depassement>=0;
+  box.innerHTML=`
+    <div class="kpis" style="margin-bottom:10px;">
+      <div class="kpi"><div class="l">Seuil de rentabilité (Année 1)</div><div class="v">${fmtC(s.seuil)}</div></div>
+      <div class="kpi ${ok?'ok':'warn'}"><div class="l">Votre chiffre d'affaires prévu</div><div class="v">${fmtC(s.ca)}</div></div>
+      <div class="kpi ${ok?'ok':'warn'}"><div class="l">${ok?'Marge au-dessus du seuil':'Manque pour atteindre le seuil'}</div><div class="v">${fmtC(Math.abs(depassement))}</div></div>
+      <div class="kpi"><div class="l">Atteint après</div><div class="v">${s.pointMortJours!==null?s.pointMortJours+' jours':'—'}</div></div>
+    </div>
+    <p class="note" style="margin:0;">C'est le chiffre d'affaires minimum à atteindre pour ne perdre ni gagner d'argent. ${ok?"Votre prévision le dépasse — c'est un bon signal.":"Votre prévision actuelle ne l'atteint pas — revoyez vos ventes ou vos charges à l'Étape II."} Calcul basé sur l'Année 1 : le coût des ventes est traité comme une charge qui suit vos ventes, le reste (salaires, loyer, etc.) comme une charge fixe.</p>`;
+}
+
+function buildRatiosFinanciers(){
+  const box=document.getElementById('ratiosBox');
+  if(!box) return;
+  const r=ratiosFinanciersCalc();
+  const y1=r[0], y5=r[4];
+  const pct=v=> v===null?'—':fmt(v*100)+' %';
+  const yrs=v=> v===null?'—':fmt(v*10)/10+' an(s)';
+
+  const secteur=state.fiche.secteur;
+  const bench=SECTOR_BENCHMARKS[secteur]||SECTOR_BENCHMARKS['Autre'];
+  let benchNote='';
+  if(y1.rentabiliteNette!==null){
+    const rn1pct=y1.rentabiliteNette*100;
+    const dansRepere = rn1pct>=bench[0] && rn1pct<=bench[1];
+    const secteurLabel = SECTOR_TEMPLATES[secteur] ? secteur : 'votre secteur';
+    benchNote=`<div class="status-bar ${dansRepere?'ok':'warn'}" style="margin-top:10px;">Repère indicatif pour ${secteurLabel} : une rentabilité nette entre ${bench[0]}% et ${bench[1]}% est courante. ${dansRepere?"Votre Année 1 ("+fmt(rn1pct)+"%) se situe dans cet ordre de grandeur.":"Votre Année 1 ("+fmt(rn1pct)+"%) est "+(rn1pct<bench[0]?"en dessous":"au-dessus")+" de cet ordre de grandeur — ce n'est pas forcément un problème, mais ça mérite d'être vérifié."}</div>`;
+  }
+
+  box.innerHTML=`
+    <div class="tbl-wrap"><table class="ledger">
+      <thead><tr><th>Indicateur</th><th>Année 1</th><th>Année 5</th></tr></thead>
+      <tbody>
+        <tr><td>Autonomie financière — part financée par vos fonds propres</td><td class="num-cell">${pct(y1.autonomie)}</td><td class="num-cell">${pct(y5.autonomie)}</td></tr>
+        <tr><td>Capacité d'autofinancement (CAF) — cash généré par votre activité (résultat net + amortissements)</td><td class="num-cell ${y1.caf<0?'neg':'pos'}">${fmtC(y1.caf)}</td><td class="num-cell ${y5.caf<0?'neg':'pos'}">${fmtC(y5.caf)}</td></tr>
+        <tr><td>Rentabilité nette — part du CA qui devient du bénéfice</td><td class="num-cell ${y1.rentabiliteNette<0?'neg':'pos'}">${pct(y1.rentabiliteNette)}</td><td class="num-cell ${y5.rentabiliteNette<0?'neg':'pos'}">${pct(y5.rentabiliteNette)}</td></tr>
+        <tr><td>Capacité de remboursement — temps pour rembourser vos dettes avec vos bénéfices</td><td class="num-cell">${yrs(y1.capaciteRemb)}</td><td class="num-cell">${yrs(y5.capaciteRemb)}</td></tr>
+        <tr><td>Taux d'endettement — dettes par rapport à vos fonds propres</td><td class="num-cell">${pct(y1.endettement)}</td><td class="num-cell">${pct(y5.endettement)}</td></tr>
+      </tbody>
+    </table></div>
+    ${benchNote}
+    <p class="note">Repère utilisé par les banques : une capacité de remboursement inférieure à 3-4 ans est généralement considérée comme saine. Les repères par secteur sont des ordres de grandeur indicatifs pour vous orienter, pas des statistiques officielles.</p>`;
+}
+
+function attachInputs(container){
+  container.querySelectorAll('input[data-group]').forEach(inp=>{
+    inp.addEventListener('input',e=>{
+      const {group,key,i}=e.target.dataset;
+      const v=num(e.target.value);
+      if(group==='resultat') state.resultat[key][i]=v;
+      else if(group==='financement.besoins') state.financement.besoins[key]=v;
+      else if(group==='financement.ressources') state.financement.ressources[key]=v;
+      renderAll(true, e.target);
+    });
+  });
+}
+
+function bindFiche(){
+  const deviseSel=document.getElementById('f_devise');
+  deviseSel.innerHTML=CURRENCIES.map(c=>`<option value="${c.code}">${c.label}</option>`).join('');
+  deviseSel.value=state.fiche.devise||'XOF';
+  deviseSel.addEventListener('change',()=>{ state.fiche.devise=deviseSel.value; renderAll(); });
+
+  const secteurSel=document.getElementById('f_secteur');
+  const secteurAutreWrap=document.getElementById('f_secteurAutreWrap');
+  const secteurAutreInput=document.getElementById('f_secteurAutre');
+  secteurSel.innerHTML='<option value="">— Choisissez —</option>'+SECTOR_LIST.map(s=>`<option value="${s}">${s}</option>`).join('');
+  const knownSector=SECTOR_LIST.includes(state.fiche.secteur);
+  if(state.fiche.secteur && !knownSector){
+    secteurSel.value='Autre';
+    secteurAutreWrap.classList.remove('hidden');
+    secteurAutreInput.value=state.fiche.secteur;
+  } else {
+    secteurSel.value=state.fiche.secteur||'';
+  }
+  secteurSel.addEventListener('change',()=>{
+    const val=secteurSel.value;
+    secteurAutreWrap.classList.toggle('hidden', val!=='Autre');
+    if(val==='Autre'){ state.fiche.secteur=secteurAutreInput.value; }
+    else { state.fiche.secteur=val; applySectorTemplate(val); }
+    if(isDone(0)) showErr('ficheErr','');
+    renderTabs(); renderCtx(); scheduleSave();
+  });
+  secteurAutreInput.addEventListener('input',()=>{
+    state.fiche.secteur=secteurAutreInput.value;
+    if(isDone(0)) showErr('ficheErr','');
+    renderCtx(); scheduleSave();
+  });
+
+  const moneyKeys=['capital','apport','montant'];
+  const map={f_nom:'nom',f_forme:'forme',f_date:'date',f_capital:'capital',f_apport:'apport',f_montant:'montant',f_duree:'duree',f_taux:'taux',f_objet:'objet',f_effectif:'effectif',f_tva:'tva'};
+  Object.entries(map).forEach(([id,key])=>{
+    const el=document.getElementById(id);
+    const isMoney=moneyKeys.includes(key);
+    el.value = isMoney ? (state.fiche[key]?fmt(state.fiche[key]):'') : (state.fiche[key]||'');
+    el.addEventListener('input',()=>{
+      const isNum=['capital','apport','montant','duree','taux','effectif','tva'].includes(key);
+      state.fiche[key]=isNum?num(el.value):el.value;
+      if(isMoney){ el.value=state.fiche[key]?fmt(state.fiche[key]):''; const p=el.value.length; el.setSelectionRange(p,p); }
+      if(isDone(0)) showErr('ficheErr','');
+      renderTabs(); renderCtx(); scheduleSave();
+    });
+  });
+  const tresoInitEl=document.getElementById('f_tresoInit2');
+  tresoInitEl.addEventListener('input',e=>{
+    state.fiche.tresoInit=num(e.target.value);
+    renderAll(true,e.target);
+  });
+  document.getElementById('r_tauxIS').addEventListener('input',e=>{state.resultat.tauxIS=num(e.target.value);renderAll(true,e.target);});
+}
+
+// Ajoute les charges courantes du secteur choisi, sans écraser ce que l'utilisateur a déjà rempli.
+function applySectorTemplate(secteur){
+  const labels=SECTOR_TEMPLATES[secteur]||[];
+  if(!labels.length) return;
+  if(state.resultatMensuel.charges.length>0) return; // on ne touche pas à une liste déjà commencée
+  labels.forEach(label=>{
+    const entry=CHARGES_CATALOGUE.find(([l])=>l===label);
+    if(!entry) return;
+    state.resultatMensuel.charges.push({id:uid(),label:entry[0],categorie:entry[1],montant:0,croissance:0,catalogueKey:entry[0]});
+  });
+  showToast(labels.length+' charges courantes pour "'+secteur+'" ajoutées à l\'Étape II — modifiez les montants selon votre activité.');
+}
+
+/* ---------- MASTER RENDER ---------- */
+function renderAll(preserveFocus,focusEl){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+current).classList.add('active');
+  renderTabs(); renderCtx();
+  if(current===1) buildResultatMensuelTable();
+  if(current===2) buildResultatTable();
+  if(current===3) buildBilanTable();
+  if(current===4) buildTresoTable();
+  if(current===5) buildFinancementTables();
+  if(current===6) buildSynthese();
+  if(preserveFocus && focusEl && focusEl.dataset){
+    const sel=`input[data-group="${focusEl.dataset.group}"][data-key="${focusEl.dataset.key}"][data-i="${focusEl.dataset.i}"]`;
+    const again=document.querySelector(sel);
+    if(again){again.focus(); const val=again.value; again.setSelectionRange(val.length,val.length);}
+  }
+  updateAccessBadge();
+  scheduleSave();
+}
+
+/* ---------- EXPORTS ---------- */
+document.querySelectorAll('#scenarioSwitch button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    currentScenario=btn.dataset.scenario;
+    document.querySelectorAll('#scenarioSwitch button').forEach(b=>b.classList.toggle('active', b===btn));
+    renderAll();
+  });
+});
+
+document.getElementById('btnReset').onclick=()=>{
+  if(!confirm("Réinitialiser tout le dossier ? Cette action est irréversible.")) return;
+  Object.keys(DEFAULT_STATE).forEach(k=>{ state[k]=JSON.parse(JSON.stringify(DEFAULT_STATE[k])); });
+  current=0;
+  currentScenario='realiste';
+  document.querySelectorAll('#scenarioSwitch button').forEach(b=>b.classList.toggle('active', b.dataset.scenario==='realiste'));
+  bindFiche();
+  renderAll();
+  apiFetch('/api/dossier',{method:'PUT',body:JSON.stringify({data:state})}).catch(()=>{});
+};
+
+document.getElementById('btnExcel').onclick=()=>requestExport('excel');
+document.getElementById('btnPdf').onclick=()=>requestExport('pdf');
+function runExport(kind){ if(kind==='excel') exportExcel(); else exportPdf(); }
+
+function exportExcel(){
+  const wb=XLSX.utils.book_new();
+  const f=state.fiche;
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+    ["TAPA FinModel — TAPA CONSEIL"],[],
+    ["Entreprise",f.nom],["Secteur",f.secteur],["Effectif",f.effectif||0],["Forme juridique",f.forme],["Date de création",f.date],["Devise",curr()],
+    ["Classification","Niveau "+classificationProjetCalc().niveau+" — "+classificationProjetCalc().label],
+    ["Capital social",f.capital],["Apport personnel",f.apport],["Montant crédit sollicité",f.montant],
+    ["Durée (mois)",f.duree],["Taux d'intérêt (%)",f.taux],["Objet",f.objet]
+  ]), "Fiche");
+
+  const {encTot,decTot,solde,cumule}=tresoMonthlyTotals();
+  const mHead=["Poste",...Array.from({length:MONTHS},(_,i)=>"Mois "+(i+1)),"Total"];
+
+  const rm=resultatMensuelCalc();
+  const rmRows=[mHead];
+  const sum=arr=>arr.reduce((a,b)=>a+b,0);
+  state.resultatMensuel.ventes.forEach(l=>{ const m=ligneMonthly(l); rmRows.push([l.label,...m,sum(m)]); });
+  rmRows.push(["Chiffre d'affaires total",...rm.categories.ca,sum(rm.categories.ca)]);
+  if(state.resultatMensuel.apports.length){
+    state.resultatMensuel.apports.forEach(l=>{ const m=ligneMonthly(l); rmRows.push([l.label,...m,sum(m)]); });
+  }
+  state.resultatMensuel.charges.forEach(l=>{ const m=ligneMonthly(l); rmRows.push([l.label,...m,sum(m)]); });
+  rmRows.push(["EBE",...rm.ebe,sum(rm.ebe)],["Résultat d'exploitation",...rm.rex,sum(rm.rex)],
+    ["Résultat financier",...rm.rfin,sum(rm.rfin)],["Résultat avant impôt",...rm.rai,sum(rm.rai)],
+    ["Fiscalité (IS)",...rm.is,sum(rm.is)],["Résultat net",...rm.rn,sum(rm.rn)]);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rmRows), "Resultat 12 mois");
+
+  const trRows=[mHead];
+  state.resultatMensuel.ventes.forEach(l=>{ const m=tresoLigneMonthly('ventes',l); trRows.push([l.label,...m,sum(m)]); });
+  state.resultatMensuel.apports.forEach(l=>{ const m=tresoLigneMonthly('apports',l); trRows.push([l.label,...m,sum(m)]); });
+  trRows.push(["Total encaissements",...encTot,sum(encTot)]);
+  state.resultatMensuel.charges.forEach(l=>{ const m=tresoLigneMonthly('charges',l); trRows.push([l.label,...m,sum(m)]); });
+  trRows.push(["Remboursement de capital de votre emprunt",...state.treso.remboursement,sum(state.treso.remboursement)]);
+  trRows.push(["Total décaissements",...decTot,sum(decTot)]);
+  trRows.push(["Solde du mois",...solde,sum(solde)]);
+  trRows.push(["Solde cumulé",...cumule,cumule[cumule.length-1]]);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(trRows), "Trésorerie");
+
+  const r=resultatYearly();
+  const yrHead=["Poste",...Array.from({length:YEARS},(_,i)=>"Année "+(i+1))];
+  const reRows=[yrHead];
+  RES_PROD.forEach(([k,l])=>reRows.push([l,...state.resultat[k]]));
+  RES_CHARGE.forEach(([k,l])=>reRows.push([l,...state.resultat[k]]));
+  reRows.push(["EBE",...r.ebe],["Résultat d'exploitation",...r.rex],
+    ["Résultat financier",...r.rfin],["Résultat avant impôt",...r.rai],["Fiscalité (IS)",...r.is],["Résultat net",...r.rn]);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(reRows), "Compte de resultat");
+
+  const b=bilanYearly();
+  const biRows=[["Scénario",SCENARIO_LABELS[currentScenario]],[],yrHead];
+  biRows.push(["Immobilisations nettes",...b.immob],["Besoin en fonds de roulement",...b.bfr],
+    ["Trésorerie",...b.treso],["TOTAL ACTIF",...b.actif],
+    ["Capital social",...zeros(YEARS).map(()=>f.capital)],["Réserves",...b.reserves],
+    ["Dettes financières",...b.dette],["TOTAL PASSIF",...b.passif]);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(biRows), "Bilan");
+
+  const fin=financementTotals();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+    ["BESOINS","Montant"],
+    ...BESOINS.map(([k,l])=>[l,state.financement.besoins[k]]),
+    ["Total Besoins",fin.totBesoins],[],
+    ["RESSOURCES","Montant"],
+    ["Apport personnel",f.apport],["Emprunt bancaire",f.montant],
+    ["Subventions",state.financement.ressources.subventions],["Autres ressources",state.financement.ressources.autres],
+    ["Total Ressources",fin.totRessources],[],["Écart",fin.ecart]
+  ]), "Financement");
+
+  XLSX.writeFile(wb, (f.nom||'tapa-finmodel').replace(/[^a-z0-9]+/gi,'_')+"_TAPA-FinModel.xlsx");
+}
+
+function exportPdf(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'pt',format:'a4'});
+  const navy=[10,27,61], gold=[201,162,39];
+  const pageW=doc.internal.pageSize.getWidth();
+  const f=state.fiche;
+
+  // Cover
+  doc.setFillColor(...navy); doc.rect(0,0,pageW,200,'F');
+  doc.setFillColor(...gold); doc.rect(0,196,pageW,4,'F');
+  doc.setTextColor(230,216,168); doc.setFont('helvetica','bold'); doc.setFontSize(11);
+  doc.text("DOCUMENTS FINANCIERS", 40, 55);
+  doc.setFontSize(26); doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255);
+  doc.text(f.nom||'Entreprise non renseignée', 40, 130);
+  doc.setFontSize(11); doc.setFont('helvetica','normal');
+  doc.text([f.secteur, new Date().toLocaleDateString('fr-FR')].filter(Boolean).join(' · '), 40, 155);
+
+  doc.setTextColor(30,30,30); doc.setFontSize(10);
+  let y=240;
+  const line=(l,v)=>{doc.setFont('helvetica','bold'); doc.text(l+" :",40,y); doc.setFont('helvetica','normal'); doc.text(String(v||'-'),200,y); y+=18;};
+  const classif=classificationProjetCalc();
+  line("Classification du projet", "Niveau "+classif.niveau+" — "+classif.label);
+  line("Secteur d'activité", f.secteur);
+  line("Effectif", (f.effectif||0)+" personne(s)");
+  line("Devise du dossier", curr());
+  line("Forme juridique", f.forme);
+  line("Date de création", f.date);
+  line("Objet du financement", f.objet);
+  line("Montant du crédit sollicité", fmtC(f.montant));
+  line("Durée du crédit", f.duree+" mois");
+  line("Taux d'intérêt estimé", f.taux+" %");
+  line("Document généré le", new Date().toLocaleDateString('fr-FR'));
+  doc.setFontSize(9); doc.setTextColor(120,120,120);
+  doc.text("Document indicatif d'aide à la préparation d'un dossier de crédit. Ne remplace pas l'avis d'un professionnel.",40,760);
+
+  const headStyle={fillColor:navy,textColor:255,fontStyle:'bold',fontSize:8};
+  const bodyStyle={fontSize:8};
+  const addSection=(title,head,rows)=>{
+    doc.addPage();
+    doc.setFillColor(...navy); doc.rect(0,0,pageW,50,'F');
+    doc.setFillColor(...gold); doc.rect(0,48,pageW,2,'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(14); doc.setFont('helvetica','bold');
+    doc.text(title,40,32);
+    doc.autoTable({startY:70, head:[head], body:rows, headStyles:headStyle, bodyStyles:bodyStyle, margin:{left:30,right:30}, styles:{cellPadding:4}});
+  };
+  // Un graphique n'est dessiné que quand on visite son module — on force ici le redessin des 4
+  // graphiques (animation désactivée) pour être sûr de pouvoir les capturer, même si l'utilisateur
+  // n'a pas ouvert tous les onglets avant d'exporter.
+  try{ drawResultatMensuelChart(resultatMensuelCalc()); }catch(e){ console.error('Graphique résultat 12 mois indisponible pour le PDF:',e); }
+  try{ drawResultatChart(resultatYearly()); }catch(e){ console.error('Graphique résultat 5 ans indisponible pour le PDF:',e); }
+  try{ drawBilanChart(bilanYearly()); }catch(e){ console.error('Graphique bilan indisponible pour le PDF:',e); }
+  try{ const tInit=tresoMonthlyTotals(); drawTresoChart(tInit.encTot,tInit.decTot,tInit.cumule); }catch(e){ console.error('Graphique trésorerie indisponible pour le PDF:',e); }
+  const pageH=doc.internal.pageSize.getHeight();
+  const addChartAfterTable=(canvasId)=>{
+    const canvas=document.getElementById(canvasId);
+    if(!canvas || canvas.width===0) return;
+    let img;
+    try{ img=canvas.toDataURL('image/png',1.0); }catch(e){ return; }
+    const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY : 100;
+    const chartH=180, chartW=pageW-80;
+    if(finalY+chartH+30 > pageH-30){ doc.addPage(); doc.addImage(img,'PNG',40,40,chartW,chartH); }
+    else { doc.addImage(img,'PNG',40,finalY+20,chartW,chartH); }
+  };
+
+  const mHead=["Poste",...Array.from({length:MONTHS},(_,i)=>"M"+(i+1)),"Total"];
+  const yHead=["Poste",...Array.from({length:YEARS},(_,i)=>"Année "+(i+1))];
+  const sumFmt=arr=>fmt(arr.reduce((a,b)=>a+b,0));
+
+  const rm=resultatMensuelCalc();
+  const rmRows=[];
+  state.resultatMensuel.ventes.forEach(l=>{ const m=ligneMonthly(l); rmRows.push([l.label,...m.map(fmt),sumFmt(m)]); });
+  rmRows.push([{content:"Chiffre d'affaires total",styles:{fontStyle:'bold'}},...rm.categories.ca.map(fmt),sumFmt(rm.categories.ca)]);
+  if(state.resultatMensuel.apports.length){
+    state.resultatMensuel.apports.forEach(l=>{ const m=ligneMonthly(l); rmRows.push([l.label,...m.map(fmt),sumFmt(m)]); });
+  }
+  state.resultatMensuel.charges.forEach(l=>{ const m=ligneMonthly(l); rmRows.push([l.label,...m.map(fmt),sumFmt(m)]); });
+  rmRows.push([{content:"Excédent brut d'exploitation (EBE)",styles:{fontStyle:'bold'}},...rm.ebe.map(fmt),sumFmt(rm.ebe)]);
+  rmRows.push([{content:"Résultat d'exploitation",styles:{fontStyle:'bold'}},...rm.rex.map(fmt),sumFmt(rm.rex)]);
+  rmRows.push([{content:"Résultat net",styles:{fontStyle:'bold',textColor:gold}},...rm.rn.map(fmt),sumFmt(rm.rn)]);
+  addSection("Compte de Résultat Prévisionnel — 12 mois", mHead, rmRows);
+  addChartAfterTable('resultatMensuelChart');
+
+  const r=resultatYearly();
+  const reRows=[];
+  RES_PROD.forEach(([k,l])=>reRows.push([l,...state.resultat[k].map(fmt)]));
+  RES_CHARGE.forEach(([k,l])=>reRows.push([l,...state.resultat[k].map(fmt)]));
+  reRows.push([{content:"Résultat d'exploitation",styles:{fontStyle:'bold'}},...r.rex.map(fmt)]);
+  reRows.push([{content:"Résultat net",styles:{fontStyle:'bold',textColor:gold}},...r.rn.map(fmt)]);
+  addSection("Compte de Résultat Prévisionnel — 5 ans", yHead, reRows);
+  addChartAfterTable('resultatChart');
+
+  const b=bilanYearly();
+  const biRows=[
+    ["Immobilisations nettes",...b.immob.map(fmt)],
+    ["Besoin en fonds de roulement",...b.bfr.map(fmt)],
+    ["Trésorerie",...b.treso.map(fmt)],
+    [{content:"TOTAL ACTIF",styles:{fontStyle:'bold'}},...b.actif.map(fmt)],
+    ["Capital social",...zeros(YEARS).map(()=>fmt(f.capital))],
+  ];
+  if(b.apportsEtCote>0) biRows.push(["Apports et argent mis de côté",...zeros(YEARS).map(()=>fmt(b.apportsEtCote))]);
+  biRows.push(
+    ["Réserves",...b.reserves.map(fmt)],
+    ["Dettes financières",...b.dette.map(fmt)],
+    [{content:"TOTAL PASSIF",styles:{fontStyle:'bold',textColor:gold}},...b.passif.map(fmt)],
+  );
+  addSection("Bilan Prévisionnel — 5 ans (scénario "+SCENARIO_LABELS[currentScenario]+")", yHead, biRows);
+  addChartAfterTable('bilanChart');
+
+  const {encTot,decTot,solde,cumule}=tresoMonthlyTotals();
+  const trRows=[];
+  state.resultatMensuel.ventes.forEach(l=>{ const m=tresoLigneMonthly('ventes',l); trRows.push([l.label,...m.map(fmt),sumFmt(m)]); });
+  state.resultatMensuel.apports.forEach(l=>{ const m=tresoLigneMonthly('apports',l); trRows.push([l.label,...m.map(fmt),sumFmt(m)]); });
+  trRows.push([{content:"Total encaissements",styles:{fontStyle:'bold'}},...encTot.map(fmt),sumFmt(encTot)]);
+  state.resultatMensuel.charges.forEach(l=>{ const m=tresoLigneMonthly('charges',l); trRows.push([l.label,...m.map(fmt),sumFmt(m)]); });
+  trRows.push(["Remboursement de capital de votre emprunt",...state.treso.remboursement.map(fmt),sumFmt(state.treso.remboursement)]);
+  trRows.push([{content:"Total décaissements",styles:{fontStyle:'bold'}},...decTot.map(fmt),sumFmt(decTot)]);
+  trRows.push([{content:"Solde du mois",styles:{fontStyle:'bold'}},...solde.map(fmt),sumFmt(solde)]);
+  trRows.push([{content:"Solde cumulé",styles:{fontStyle:'bold',textColor:gold}},...cumule.map(fmt),fmt(cumule[cumule.length-1])]);
+  addSection("Plan de Trésorerie — 12 mois", mHead, trRows);
+  addChartAfterTable('tresoChart');
+
+  const fin=financementTotals();
+  const finRows=[
+    [{content:"BESOINS",styles:{fontStyle:'bold'}},""],
+    ...BESOINS.map(([k,l])=>[l,fmt(state.financement.besoins[k])]),
+    [{content:"Total Besoins",styles:{fontStyle:'bold'}},fmt(fin.totBesoins)],
+    [{content:"RESSOURCES",styles:{fontStyle:'bold'}},""],
+    ["Apport personnel",fmt(f.apport)],
+    ["Emprunt bancaire sollicité",fmt(f.montant)],
+    ["Subventions",fmt(state.financement.ressources.subventions)],
+    ["Autres ressources",fmt(state.financement.ressources.autres)],
+    [{content:"Total Ressources",styles:{fontStyle:'bold'}},fmt(fin.totRessources)],
+    [{content:"Écart",styles:{fontStyle:'bold',textColor:gold}},fmt(fin.ecart)],
+  ];
+  addSection("Plan de Financement", ["Poste","Montant ("+curr()+")"], finRows);
+
+  // Page de signature — renforce le sérieux du dossier face à la banque.
+  doc.addPage();
+  doc.setFillColor(...navy); doc.rect(0,0,pageW,50,'F');
+  doc.setFillColor(...gold); doc.rect(0,48,pageW,2,'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(14); doc.setFont('helvetica','bold');
+  doc.text("Validation du dossier", 40, 32);
+
+  doc.setTextColor(30,30,30); doc.setFontSize(10); doc.setFont('helvetica','normal');
+  let sy=110;
+  doc.text("Je soussigné(e), certifie que les informations et prévisions contenues dans ce dossier",40,sy);
+  doc.text("reflètent au mieux de ma connaissance la situation et les perspectives de mon entreprise.",40,sy+16);
+
+  sy+=70;
+  doc.setFont('helvetica','bold'); doc.text("Nom et prénom :",40,sy); doc.setFont('helvetica','normal');
+  doc.line(170,sy+2,400,sy+2);
+  sy+=45;
+  doc.setFont('helvetica','bold'); doc.text("Signature :",40,sy); doc.setFont('helvetica','normal');
+  doc.line(170,sy+2,400,sy+2);
+  sy+=45;
+  doc.setFont('helvetica','bold'); doc.text("Date :",40,sy); doc.setFont('helvetica','normal');
+  doc.line(170,sy+2,400,sy+2);
+
+  doc.setFontSize(9); doc.setTextColor(120,120,120);
+  doc.text("Document généré via TAPA FinModel · \"L'Intelligence Financière Pour Tous\"",40,760);
+
+  doc.save((f.nom||'tapa-finmodel').replace(/[^a-z0-9]+/gi,'_')+"_TAPA-FinModel.pdf");
+}
+
+/* ---------- INIT ---------- */
+let appInitialized=false;
+function initApp(){
+  if(appInitialized) return;
+  appInitialized=true;
+  bindFiche();
+  renderAll();
+}
+})();
+</script>
+</body>
+</html>
