@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide pratique — TAPA CONSEIL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0A1B3D;
+  --gold:#C9A227;
+  --paper:#F7F4EC;
+  --paper-line:#DCD5C2;
+  --ink:#241F14;
+  --ink-soft:#6b6455;
+  --green:#2F6844;
+  --white:#ffffff;
+  --radius:2px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:15px;line-height:1.6;}
+h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:600;margin:0;}
+a{color:var(--navy);}
+.btn{border:1px solid var(--navy);background:var(--white);color:var(--navy);padding:10px 18px;font-size:13px;font-weight:600;border-radius:var(--radius);cursor:pointer;text-decoration:none;display:inline-block;}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:var(--navy);}
+
+.landing-nav{display:flex;align-items:center;justify-content:space-between;padding:22px 5%;border-bottom:1px solid var(--paper-line);}
+.landing-nav .mark{font-family:'Fraunces',serif;font-weight:700;font-size:19px;color:var(--navy);display:flex;align-items:center;gap:10px;}
+.landing-nav .mark span{color:var(--gold);}
+.brand-logo{height:34px;width:auto;display:block;}
+.brand-logo.hidden{display:none;}
+.navlinks{display:flex;gap:24px;align-items:center;}
+.landing-nav a{color:var(--navy);font-size:13.5px;font-weight:600;text-decoration:none;cursor:pointer;}
+.navmenu-link{padding:7px 4px;border-bottom:2px solid transparent;}
+.navmenu-link.active{color:var(--gold);border-bottom-color:var(--gold);}
+.navmenu-link:hover{color:var(--gold);}
+
+.wrap{max-width:1100px;margin:0 auto;padding:40px 5% 90px;display:grid;grid-template-columns:230px 1fr;gap:48px;}
+@media (max-width:800px){ .wrap{grid-template-columns:1fr;} .toc{display:none;} }
+
+.toc{position:sticky;top:24px;align-self:start;font-size:13px;}
+.toc h4{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--ink-soft);margin-bottom:12px;}
+.toc a{display:block;color:var(--ink-soft);padding:5px 0;text-decoration:none;border-left:2px solid transparent;padding-left:10px;}
+.toc a:hover{color:var(--navy);border-left-color:var(--gold);}
+
+.hero{margin-bottom:36px;}
+.hero .eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:700;}
+.hero h1{font-size:32px;margin:10px 0 12px;color:var(--navy);}
+.hero p{color:var(--ink-soft);max-width:640px;}
+
+section{margin-bottom:48px;scroll-margin-top:24px;}
+section h2{font-size:22px;color:var(--navy);border-bottom:2px solid var(--gold);padding-bottom:10px;margin-bottom:18px;}
+section h3{font-size:16px;color:var(--navy);margin:22px 0 8px;}
+.card{background:var(--white);border:1px solid var(--paper-line);border-radius:var(--radius);padding:20px 24px;margin-bottom:14px;}
+.card h4{font-size:14.5px;color:var(--navy);margin-bottom:6px;}
+.card p{margin:0;color:var(--ink);font-size:14px;}
+.tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:12px;margin-bottom:8px;}
+.tag.free{background:#e7f0e9;color:var(--green);}
+.tag.paid{background:#f6e8e6;color:#A8362B;}
+.tag.optional{background:#f0ede0;color:var(--ink-soft);}
+
+dl{margin:0;}
+dt{font-weight:700;color:var(--navy);font-size:14px;margin-top:16px;}
+dd{margin:4px 0 0;color:var(--ink);font-size:13.5px;}
+
+details{background:var(--white);border:1px solid var(--paper-line);border-radius:var(--radius);padding:14px 18px;margin-bottom:10px;}
+details summary{font-weight:600;color:var(--navy);cursor:pointer;font-size:14.5px;}
+details p{margin:10px 0 0;color:var(--ink);font-size:14px;}
+
+.note-box{background:#fdf8ec;border-left:3px solid var(--gold);padding:12px 16px;font-size:13.5px;color:var(--ink);margin:14px 0;}
+.foot{text-align:center;padding:40px 5%;color:var(--ink-soft);font-size:12px;border-top:1px solid var(--paper-line);}
+</style>
+</head>
+<body>
+
+<div class="landing-nav">
+  <div class="mark"><img src="logo.png" alt="" class="brand-logo" onerror="this.classList.add('hidden')">TAPA <span>DOC</span></div>
+  <div class="navlinks">
+    <a href="Accueil-TAPA-CONSEIL.html" class="navmenu-link">Accueil</a>
+    <a href="Etablir-Business-Plan.html" class="navmenu-link">Business Plan</a>
+    <a href="TAPA-FinModel.html" class="navmenu-link">TAPA FinModel</a>
+    <a href="TAPA-Procedures.html" class="navmenu-link">TAPA Procédures</a>
+    <a href="Guide-Pratique-TAPA-CONSEIL.html" class="navmenu-link active">Guide pratique</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <nav class="toc">
+    <h4>Sommaire</h4>
+    <a href="#choisir">Quel outil choisir ?</a>
+    <a href="#fiche">Fiche Entreprise</a>
+    <a href="#promoteur">Promoteur & projet</a>
+    <a href="#marche">Marché / Stratégie / Opérations</a>
+    <a href="#resultat12">Résultat 12 mois</a>
+    <a href="#resultat5">Résultat 5 ans</a>
+    <a href="#bilan">Bilan</a>
+    <a href="#treso">Trésorerie</a>
+    <a href="#financement">Financement</a>
+    <a href="#synthese">Synthèse & scénarios</a>
+    <a href="#procedures">TAPA Procédures</a>
+    <a href="#lexique">Lexique</a>
+    <a href="#faq">Questions fréquentes</a>
+  </nav>
+
+  <div>
+    <div class="hero">
+      <div class="eyebrow">Guide pratique</div>
+      <h1>Comment bien remplir votre dossier</h1>
+      <p>Ce guide explique chaque étape en langage simple. Vous n'avez pas besoin de tout lire d'un coup — consultez la section qui vous concerne au moment où vous en avez besoin.</p>
+    </div>
+
+    <section id="choisir">
+      <h2>Quel outil choisir ?</h2>
+      <div class="note-box">Nos tarifs sont proportionnés à votre projet — vous ne payez que ce qui correspond à sa taille réelle, calculée automatiquement à partir des chiffres que vous saisissez déjà. Pas de question séparée sur votre budget, pas de mauvaise surprise : le prix exact s'affiche avant le paiement.</div>
+      <div class="card">
+        <h4>TAPA FinModel — à partir de 15 000 FCFA</h4>
+        <p>Pour préparer rapidement un dossier de crédit classique : compte de résultat, bilan, trésorerie, plan de financement. Va droit à l'essentiel.</p>
+      </div>
+      <div class="card">
+        <h4>Établir votre Business Plan — à partir de 15 000 FCFA</h4>
+        <p>Le même moteur financier, plus complet : présentation du promoteur, étude de marché, stratégie, opérations, risques, classification du projet, 3 scénarios et diagnostic. Pour un dossier plus complet, notamment face à un investisseur.</p>
+      </div>
+      <div class="card">
+        <h4>TAPA Procédures — à partir de 25 000 FCFA</h4>
+        <p>Différent des deux autres : ici, pas de chiffres, mais un <b>manuel de procédures</b> rédigé pour vous — pour structurer la gestion quotidienne de votre entreprise (administratif/financier ou comptable), utile aussi pour un dossier de crédit. Utile en complément de TAPA FinModel ou du Business Plan, pas à leur place.</p>
+      </div>
+      <p><em>Vous ne savez pas lequel choisir ? Si on vous a seulement demandé "un dossier pour la banque" avec des chiffres, prenez TAPA FinModel. Si vous devez convaincre un investisseur avec un vrai projet d'entreprise, prenez Business Plan. Si on vous demande en plus un manuel de procédures écrit (souvent pour un dossier de crédit plus formel), ajoutez TAPA Procédures.</em></p>
+    </section>
+
+    <section id="fiche">
+      <h2>Étape I — Fiche Entreprise</h2>
+      <span class="tag free">Gratuit</span>
+      <p>Les informations de base : nom, secteur, devise, montant du crédit demandé. <strong>Seuls le nom de l'entreprise et le montant du crédit sont obligatoires</strong> — tout le reste peut rester vide pour l'instant.</p>
+      <div class="note-box">Le <strong>secteur d'activité</strong> pré-remplit automatiquement des charges courantes à l'Étape II (par exemple, "Restauration" ajoute Achat de marchandises, Salaires, Loyer...). Ça vous fait gagner du temps.</div>
+      <h3>Devise et fiscalité</h3>
+      <p>Choisissez la monnaie dans laquelle vous comptez (FCFA par défaut). En Côte d'Ivoire, la TVA (18% par défaut) et les charges sociales sur salaires (ITS, CNPS, CFCE) sont calculées automatiquement — voir la section Résultat 12 mois ci-dessous.</p>
+    </section>
+
+    <section id="promoteur">
+      <h2>Promoteur & Entreprise <span class="tag optional">Business Plan uniquement</span></h2>
+      <p>Parlez de vous : formation, expérience, motivation. Une banque ou un investisseur veut savoir <em>qui</em> porte le projet, pas seulement les chiffres. Vous pouvez ajouter une photo — elle apparaîtra sur la couverture de votre document.</p>
+      <p>La <strong>mission</strong> (à quoi sert votre entreprise) et la <strong>vision</strong> (où vous voulez aller) tiennent en une ou deux phrases chacune — pas besoin d'un texte long.</p>
+    </section>
+
+    <section id="marche">
+      <h2>Marché, Stratégie, Opérations <span class="tag optional">Business Plan uniquement</span></h2>
+      <p>Trois étapes entièrement facultatives, mais qui renforcent beaucoup votre dossier si vous les remplissez :</p>
+      <dl>
+        <dt>Marché</dt>
+        <dd>Votre secteur, vos clients, vos concurrents, et vos Forces/Faiblesses/Opportunités/Menaces (SWOT). Montre que vous connaissez votre terrain.</dd>
+        <dt>Stratégie</dt>
+        <dd>Comment vous fixez vos prix, où vous vendez, comment vous vous faites connaître.</dd>
+        <dt>Opérations</dt>
+        <dd>Votre local, votre matériel, vos fournisseurs, votre équipe.</dd>
+      </dl>
+      <div class="note-box">Pas besoin d'écrire un roman. Deux ou trois phrases concrètes par question valent mieux qu'un long texte vague.</div>
+    </section>
+
+    <section id="resultat12">
+      <h2>Étape II — Résultat 12 mois</h2>
+      <span class="tag free">Gratuit</span>
+      <p>Le seul module gratuit. Indiquez combien vous pensez vendre par mois, puis piochez vos charges dans le catalogue (ou ajoutez-en une personnalisée).</p>
+      <h3>"Ça augmente ?" — c'est quoi ?</h3>
+      <p>C'est facultatif. Si vos ventes ou vos charges resteront les mêmes chaque mois, laissez à 0. Si vous pensez vendre un peu plus chaque mois qui passe, indiquez un pourcentage (par exemple 3 pour +3% chaque mois).</p>
+      <h3>Salaires : net ou brut ?</h3>
+      <p>Indiquez ce que vous versez <strong>réellement</strong> à vos employés (le net, ce qu'ils reçoivent). L'outil calcule et ajoute automatiquement en dessous ce que votre entreprise doit reverser en plus à l'État : ITS, CNPS salariale, CNPS patronale, CFCE — chacune sur sa propre ligne, marquée "estimation".</p>
+    </section>
+
+    <section id="resultat5">
+      <h2>Étape III — Résultat 5 ans</h2>
+      <span class="tag paid">Payant</span>
+      <p>Votre Année 1 est reprise automatiquement de l'Étape II — vous ne la retapez pas. Pour les années 2 à 5, indiquez un taux de croissance annuel, ou modifiez les montants directement dans le tableau.</p>
+    </section>
+
+    <section id="bilan">
+      <h2>Étape IV — Bilan</h2>
+      <span class="tag paid">Payant</span>
+      <p><strong>Vous n'avez rien à remplir ici.</strong> Le bilan est entièrement construit à partir de ce que vous avez déjà saisi dans les autres modules.</p>
+    </section>
+
+    <section id="treso">
+      <h2>Étape V — Trésorerie</h2>
+      <span class="tag paid">Payant</span>
+      <p>L'argent qui rentre et qui sort, mois par mois. Si un mois passe en négatif (rouge), ça veut dire que vous manquerez d'argent ce mois-là — c'est exactement ce qu'un banquier regarde en premier.</p>
+    </section>
+
+    <section id="financement">
+      <h2>Étape VI — Financement</h2>
+      <span class="tag paid">Payant</span>
+      <p>Deux colonnes : ce dont vous avez besoin pour démarrer (investissements, BFR de départ) et ce qui va couvrir ce besoin (votre apport, le crédit demandé, subventions). L'outil vérifie automatiquement que les deux colonnes s'équilibrent.</p>
+    </section>
+
+    <section id="synthese">
+      <h2>Synthèse, scénarios et diagnostic</h2>
+      <span class="tag paid">Payant</span>
+      <h3>Les 3 scénarios</h3>
+      <p>En haut de l'écran : Prudent / Réaliste / Ambitieux. Votre Année 1 (ce que vous avez saisi) ne change jamais — seules les années 2 à 5 s'ajustent selon le scénario choisi.</p>
+      <h3>Le diagnostic de finançabilité</h3>
+      <p>Un score sur 100 qui vous dit où vous en êtes, avec des conseils concrets si quelque chose mérite votre attention. <strong>Ce score reste sur la plateforme, pour vous seul(e)</strong> — il n'apparaît jamais dans le PDF que vous téléchargez pour votre banque.</p>
+    </section>
+
+    <section id="procedures">
+      <h2>TAPA Procédures — comment ça marche</h2>
+      <p>Un outil à part, différent de TAPA FinModel et Business Plan : ici, vous ne remplissez pas de chiffres, vous obtenez un <strong>manuel de procédures rédigé pour vous</strong>, en Word (.docx), prêt à imprimer.</p>
+
+      <h3>1. Le questionnaire (gratuit)</h3>
+      <p>Nom de l'entreprise, secteur, taille, pays, et les particularités de votre activité si vous en avez (par exemple : plusieurs points de vente, activité saisonnière...). Quelques minutes suffisent.</p>
+
+      <h3>2. Choisir votre manuel et votre formule</h3>
+      <p>Deux manuels possibles :</p>
+      <ul>
+        <li><b>Manuel PME</b> — procédures administratives et financières (organisation, RH, achats, trésorerie)</li>
+        <li><b>Manuel Comptable</b> — pour un dossier de crédit (tenue des comptes, clôtures, contrôle interne)</li>
+      </ul>
+      <p>Et deux formules :</p>
+      <ul>
+        <li><b>Standard</b> — génération immédiate par l'IA, quelques minutes</li>
+        <li><b>Validé par un expert TAPA</b> — la même génération, plus une relecture par un consultant TAPA CONSEIL avant de vous le remettre, sous 24-48h</li>
+      </ul>
+
+      <h3>3. Le paiement</h3>
+      <p>Mobile Money, comme pour les autres outils. Le prix dépend du manuel et de la formule choisis (voir la page d'accueil pour le détail des 4 tarifs).</p>
+
+      <h3>4. La génération</h3>
+      <p>Une fois payé, vous voyez chaque section de votre manuel se rédiger l'une après l'autre, en direct, sur votre écran. Comptez 1 à 2 minutes pour la formule Standard.</p>
+
+      <h3>5. Le téléchargement</h3>
+      <p>Pour la formule Standard, le bouton de téléchargement apparaît dès que la génération est terminée. Pour la formule "Validé par un expert", un message vous informe que le manuel est en cours de relecture — vous recevrez un signal et pourrez le télécharger sous 24-48h.</p>
+
+      <h3>Puis-je générer plusieurs manuels ?</h3>
+      <p>Oui, autant que vous voulez — chaque manuel est indépendant et payé séparément. Ils sont tous listés dans "Mes manuels" une fois connecté(e).</p>
+    </section>
+
+    <section id="lexique">
+      <h2>Lexique — les mots expliqués simplement</h2>
+      <details><summary>Chiffre d'affaires (CA)</summary><p>Tout l'argent que vos ventes vous rapportent, avant de retirer vos charges.</p></details>
+      <details><summary>Charges fixes / charges variables</summary><p>Une charge fixe ne change pas selon vos ventes (le loyer, par exemple). Une charge variable suit vos ventes (plus vous vendez, plus vous achetez de marchandises).</p></details>
+      <details><summary>EBE (Excédent Brut d'Exploitation)</summary><p>Ce qu'il vous reste une fois vos charges courantes payées, avant amortissements et intérêts.</p></details>
+      <details><summary>Résultat net</summary><p>Ce qu'il vous reste réellement à la fin, après tout — c'est votre bénéfice (ou votre perte).</p></details>
+      <details><summary>BFR (Besoin en Fonds de Roulement)</summary><p>L'argent qu'il vous faut avoir de côté pour tenir le temps que vos clients vous paient, pendant que vous payez déjà vos fournisseurs.</p></details>
+      <details><summary>Seuil de rentabilité</summary><p>Le chiffre d'affaires minimum à atteindre pour ne perdre ni gagner d'argent. En dessous, vous êtes en perte.</p></details>
+      <details><summary>Amortissement</summary><p>La façon d'étaler dans le temps le coût d'un équipement (par exemple, un four à 1 200 000 FCFA "coûte" 240 000 FCFA par an sur 5 ans dans vos comptes).</p></details>
+      <details><summary>Capacité de remboursement</summary><p>Le nombre d'années qu'il vous faudrait pour rembourser toutes vos dettes avec vos bénéfices. Moins de 3-4 ans est généralement considéré comme sain par une banque.</p></details>
+      <details><summary>ITS</summary><p>L'impôt que l'État prélève sur le salaire de vos employés — c'est vous, l'employeur, qui le reverse chaque mois.</p></details>
+      <details><summary>CNPS</summary><p>La caisse de retraite et de protection sociale. Une partie est retenue sur le salaire de l'employé, une autre est payée en plus par l'entreprise.</p></details>
+    </section>
+
+    <section id="faq">
+      <h2>Questions fréquentes</h2>
+      <details><summary>Je ne sais pas remplir un champ, que faire ?</summary><p>La grande majorité des champs sont facultatifs — laissez-les vides et avancez. Un conseiller TAPA CONSEIL peut vous accompagner si besoin (bouton WhatsApp dans la Synthèse).</p></details>
+      <details><summary>Mon dossier est-il sauvegardé automatiquement ?</summary><p>Oui, en continu. Un petit message "✓ Brouillon enregistré" apparaît en haut à droite à chaque sauvegarde. Vous pouvez fermer et revenir plus tard, vous reprendrez exactement où vous étiez.</p></details>
+      <details><summary>Puis-je changer de scénario après avoir payé ?</summary><p>Oui, autant de fois que vous voulez pendant vos 30 jours d'accès.</p></details>
+      <details><summary>Le diagnostic apparaît-il dans le document que je donne à ma banque ?</summary><p>Non. Le score et les alertes restent uniquement sur la plateforme, pour vous aider à améliorer votre dossier avant de le déposer. Le PDF final ne contient que des faits et des chiffres.</p></details>
+      <details><summary>Puis-je modifier mon dossier après l'avoir payé et exporté ?</summary><p>Oui, vous pouvez continuer à le modifier et le réexporter autant de fois que nécessaire pendant vos 30 jours d'accès.</p></details>
+      <details><summary>TAPA Procédures peut-il remplacer TAPA FinModel ou Business Plan ?</summary><p>Non, ce sont des documents différents et complémentaires. TAPA FinModel/Business Plan produisent vos chiffres (compte de résultat, bilan...), TAPA Procédures produit un manuel de procédures écrit. Beaucoup de dossiers de crédit demandent les deux.</p></details>
+    </section>
+  </div>
+</div>
+
+<div class="foot">TAPA CONSEIL · "L'Intelligence Financière Pour Tous" · WhatsApp <a href="https://wa.me/2250504775774" target="_blank">+225 05 04 77 57 74</a> · formationella398@gmail.com</div>
+
+</body>
+</html>
