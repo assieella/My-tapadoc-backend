@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Back office — TAPA CONSEIL</title>
+<style>
+:root{--navy:#0A1B3D;--gold:#C9A227;--cream:#F7F4EC;--line:#DCD5C2;--ink:#241F14;--mut:#6B6450;--red:#B3261E;--green:#2E7D32;--orange:#C77700}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--cream);color:var(--ink);font-size:14px}
+header{background:var(--navy);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header h1{font-family:Georgia,serif;font-size:18px;margin:0;font-weight:600}
+header h1 span{color:var(--gold)}
+nav{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
+nav button{background:transparent;border:1px solid transparent;color:#cfd6e6;padding:7px 12px;cursor:pointer;font-size:13px;border-radius:3px}
+nav button.on{background:var(--gold);color:var(--navy);font-weight:700}
+nav button:hover:not(.on){border-color:#3a4c75}
+main{max-width:1180px;margin:0 auto;padding:20px}
+h2{font-family:Georgia,serif;color:var(--navy);font-size:20px;margin:0 0 14px}
+h3{font-size:14px;color:var(--navy);margin:18px 0 8px;text-transform:uppercase;letter-spacing:.04em}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-bottom:18px}
+.card{background:#fff;border:1px solid var(--line);padding:12px 14px}
+.card b{display:block;font-size:24px;color:var(--navy)}
+.card small{color:var(--mut)}
+.card.alert b{color:var(--red)}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line)}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #eee7d4;vertical-align:top}
+th{background:#efe9d6;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--navy)}
+tr.clic{cursor:pointer}tr.clic:hover{background:#faf6e8}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:12px;background:#e9e3cf;color:var(--ink);white-space:nowrap}
+.tag.nouvelle{background:#fde8c8;color:#7a4a00}.tag.rdv_planifie{background:#dbe9ff;color:#0b3a8a}.tag.client_confirme,.tag.termine{background:#d8efd9;color:#1b5e20}.tag.sans_suite{background:#eee;color:#666}.tag.a_relancer{background:#ffe0dd;color:#8a1a12}
+.tag.late{background:#ffe0dd;color:var(--red);font-weight:700}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+button.b,a.b{background:var(--navy);color:#fff;border:0;padding:8px 14px;cursor:pointer;font-size:13px;border-radius:3px;text-decoration:none;display:inline-block}
+button.b.gold{background:var(--gold);color:var(--navy);font-weight:700}
+button.b.ghost{background:#fff;color:var(--navy);border:1px solid var(--navy)}
+button.b.red{background:var(--red)}
+button.b.sm{padding:4px 9px;font-size:12px}
+input,select,textarea{font:inherit;padding:7px 9px;border:1px solid var(--line);background:#fff;border-radius:3px;max-width:100%}
+textarea{width:100%;min-height:70px}
+label{display:block;font-size:12px;color:var(--mut);margin:8px 0 3px}
+.empty{padding:26px;text-align:center;color:var(--mut);background:#fff;border:1px dashed var(--line)}
+.login{max-width:380px;margin:12vh auto;background:#fff;border:1px solid var(--line);padding:28px;text-align:center}
+.login input{width:100%;margin:12px 0}
+.err{color:var(--red);font-size:13px;margin-top:6px}
+.ok{color:var(--green)}
+.warn{background:#fff4d6;border:1px solid #e8cf84;padding:10px 12px;margin-bottom:12px}
+.modal{position:fixed;inset:0;background:rgba(10,27,61,.55);display:none;align-items:flex-start;justify-content:center;overflow:auto;padding:24px 12px;z-index:10}
+.modal.on{display:flex}
+.panel{background:#fff;max-width:860px;width:100%;padding:22px;border-top:4px solid var(--gold)}
+.panel h2{margin-bottom:4px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px}
+@media(max-width:700px){.grid2{grid-template-columns:1fr}table{font-size:12px}}
+.kv{margin:3px 0}.kv i{color:var(--mut);font-style:normal;font-size:12px;display:block}
+.funnel div.row{display:flex;align-items:center;gap:10px;margin:5px 0}
+.funnel .lab{width:200px;font-size:13px}.funnel .fill{height:18px;background:var(--gold);min-width:2px}
+.timeline{border-left:2px solid var(--line);margin-left:6px;padding-left:12px}
+.timeline div{margin:5px 0;font-size:13px}.timeline small{color:var(--mut)}
+.note{font-size:12px;color:var(--mut)}
+code{background:#efe9d6;padding:1px 5px}
+</style>
+</head>
+<body>
+<div id="login" class="login" hidden>
+  <h2>Back office</h2>
+  <p class="note">TAPA CONSEIL — accès réservé à l'équipe</p>
+  <input id="keyIn" type="password" placeholder="Clé d'accès (ADMIN_KEY)" autocomplete="current-password">
+  <button class="b gold" id="keyBtn" style="width:100%">Entrer</button>
+  <div class="err" id="keyErr"></div>
+</div>
+
+<div id="app" hidden>
+<header>
+  <h1>TAPA <span>CONSEIL</span> — Back office</h1>
+  <nav id="nav"></nav>
+  <button class="b ghost sm" id="logout" style="background:transparent;color:#cfd6e6;border-color:#3a4c75">Quitter</button>
+</header>
+<main id="view"></main>
+</div>
+
+<div class="modal" id="modal"><div class="panel" id="panel"></div></div>
+
+<script>
+(function(){
+'use strict';
+var API = location.protocol.indexOf('http') === 0 ? '' : 'http://localhost:3000';
+var KEY = '';
+try { KEY = sessionStorage.getItem('bo_key') || ''; } catch(e){}
+var TAB = 'overview', STAT = {}, STAT_LAB = {};
+var TABS = [['overview','Vue d\'ensemble'],['demandes','Demandes'],['rdv','Rendez-vous'],['relances','Relances'],['parcours','Parcours par service'],['google','Google Agenda']];
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function api(method, path, body){
+  return fetch(API + '/api/bo' + path, { method: method, headers: { 'x-admin-key': KEY, 'content-type': 'application/json' }, body: body ? JSON.stringify(body) : undefined })
+    .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ if (r.status === 401) { logout(); throw new Error('Clé refusée.'); } if (!r.ok) throw new Error(j.error || 'Erreur ' + r.status); return j; }); });
+}
+function fmt(sql){ // "YYYY-MM-DD HH:MM:SS" (heure d'Abidjan = GMT) -> "10/01/2027 10:00"
+  if (!sql) return '—'; var m = String(sql).match(/^(\d{4})-(\d\d)-(\d\d)[ T](\d\d):(\d\d)/); return m ? m[3] + '/' + m[2] + '/' + m[1] + ' ' + m[4] + ':' + m[5] : esc(sql);
+}
+var SL={a_faire:'À faire',fait:'Fait',envoyee:'Envoyée',annulee:'Annulée',echec:'Échec',planifie:'Planifié',realise:'Réalisé',annule:'Annulé',absent:'Absent'};
+function sl(x){ return esc(SL[x]||x); }
+function toInput(sql){ return sql ? String(sql).slice(0,16).replace(' ','T') : ''; }
+function tag(s){ return '<span class="tag ' + esc(s) + '">' + esc(STAT_LAB[s] || s) + '</span>'; }
+function toast(msg, bad){ var d = document.createElement('div'); d.textContent = msg; d.style.cssText = 'position:fixed;bottom:18px;right:18px;padding:10px 16px;color:#fff;z-index:20;border-radius:3px;background:' + (bad ? '#B3261E' : '#2E7D32'); document.body.appendChild(d); setTimeout(function(){ d.remove(); }, 4200); }
+function fail(e){ toast(e.message || String(e), true); }
+
+/* ---------- connexion ---------- */
+function logout(){ try { sessionStorage.removeItem('bo_key'); } catch(e){} KEY = ''; $('app').hidden = true; $('login').hidden = false; }
+function enter(){
+  $('login').hidden = true; $('app').hidden = false;
+  $('nav').innerHTML = TABS.map(function(t){ return '<button data-t="' + t[0] + '">' + t[1] + '</button>'; }).join('');
+  $('nav').onclick = function(e){ var b = e.target.closest('button'); if (b) go(b.dataset.t); };
+  go(TAB);
+}
+$('keyBtn').onclick = tryLogin;
+$('keyIn').onkeydown = function(e){ if (e.key === 'Enter') tryLogin(); };
+function tryLogin(){
+  KEY = $('keyIn').value.trim(); $('keyErr').textContent = '';
+  fetch(API + '/api/bo/overview', { headers: { 'x-admin-key': KEY } }).then(function(r){
+    if (!r.ok) { $('keyErr').textContent = 'Clé incorrecte.'; return; }
+    try { sessionStorage.setItem('bo_key', KEY); } catch(e){}
+    r.json().then(function(j){ STAT_LAB = j.statutLabels || {}; enter(); });
+  }).catch(function(){ $('keyErr').textContent = 'Serveur injoignable.'; });
+}
+$('logout').onclick = logout;
+
+function go(t){
+  TAB = t;
+  Array.prototype.forEach.call($('nav').children, function(b){ b.classList.toggle('on', b.dataset.t === t); });
+  $('view').innerHTML = '<p class="note">Chargement…</p>';
+  ({overview: vOverview, demandes: vDemandes, rdv: vRdv, relances: vRelances, parcours: vParcours, google: vGoogle})[t]().catch(fail);
+}
+
+/* ---------- vue d'ensemble ---------- */
+function vOverview(){
+  return api('GET','/overview').then(function(o){
+    STAT_LAB = o.statutLabels; STAT = o.parStatut;
+    var c = function(n, l, alert){ return '<div class="card' + (alert && n ? ' alert' : '') + '"><b>' + n + '</b><small>' + l + '</small></div>'; };
+    var h = '<h2>Vue d\'ensemble</h2>';
+    if (o.enRetard) h += '<div class="warn"><b>' + o.enRetard + ' demande(s)</b> attendent une réponse depuis plus de 24 h. <a href="#" id="goLate">Voir les demandes</a></div>';
+    if (o.rdvSansLien) h += '<div class="warn"><b>' + o.rdvSansLien + ' rendez-vous</b> à venir sans lien Google Meet : les rappels au client en dépendent.</div>';
+    h += '<div class="cards">' + c(o.enRetard,'Demandes sans réponse > 24 h',1) + c(o.relancesRetard,'Relances en retard',1) + c(o.relancesJour,'Relances à faire aujourd\'hui') + c(o.rdvAVenir,'Rendez-vous à venir') + c(o.emailsEnAttente,'Emails clients programmés') + c(o.emailsEchec,'Emails en échec',1) + '</div>';
+    h += '<h3>TAPA PRE-CRED — demandes par statut</h3><div class="cards">' + Object.keys(o.parStatut).map(function(k){ return c(o.parStatut[k], o.statutLabels[k]); }).join('') + '</div>';
+    h += '<h3>Plateforme</h3><div class="cards">' + c(o.comptes,'Comptes créés') + c(o.payes,'Clients ayant payé') + c(Number(o.revenu).toLocaleString('fr-FR') + ' F','Paiements encaissés') + '</div>';
+    h += '<p class="note">Google Agenda : ' + (o.google.connected ? '<span class="ok">connecté (' + esc(o.google.email || '') + ')</span>' : (o.google.configured ? 'non connecté' : 'non configuré') ) + '. Toutes les heures sont affichées à l\'heure d\'Abidjan (GMT).</p>';
+    $('view').innerHTML = h;
+    var gl = $('goLate'); if (gl) gl.onclick = function(e){ e.preventDefault(); go('demandes'); };
+  });
+}
+
+/* ---------- demandes ---------- */
+var DEM = [], DFILTER = '';
+function vDemandes(){
+  return api('GET','/demandes').then(function(r){
+    DEM = r.demandes; STAT_LAB = r.statutLabels; STAT = r.statuts; drawDem();
+  });
+}
+function drawDem(){
+  var rows = DEM.filter(function(d){ return !DFILTER || (DFILTER === 'retard' ? d.enRetard : d.statut === DFILTER); });
+  var h = '<h2>Demandes TAPA PRE-CRED</h2><div class="bar"><select id="df"><option value="">Tous les statuts (' + DEM.length + ')</option><option value="retard">⚠ Sans réponse > 24 h</option>' +
+    STAT.map(function(s){ return '<option value="' + s + '">' + esc(STAT_LAB[s]) + '</option>'; }).join('') + '</select></div>';
+  if (!rows.length) h += '<div class="empty">Aucune demande.</div>';
+  else h += '<table><tr><th>Réf.</th><th>Reçue le</th><th>Entreprise / responsable</th><th>Besoin</th><th>Statut</th><th>Prochain RDV</th></tr>' + rows.map(function(d){
+    return '<tr class="clic" data-id="' + d.id + '"><td>' + esc(d.reference) + '</td><td>' + fmt(d.created_at) + (d.enRetard ? '<br><span class="tag late">&gt; 24 h</span>' : '') + '</td><td><b>' + esc(d.entreprise) + '</b><br>' + esc(d.responsable) + '</td><td>' + esc(d.besoin) + '</td><td>' + tag(d.statut) + '</td><td>' + (d.prochainRdv ? fmt(d.prochainRdv.debut) : '—') + '</td></tr>';
+  }).join('') + '</table>';
+  $('view').innerHTML = h;
+  $('df').value = DFILTER; $('df').onchange = function(){ DFILTER = this.value; drawDem(); };
+  Array.prototype.forEach.call($('view').querySelectorAll('tr.clic'), function(tr){ tr.onclick = function(){ openDemande(tr.dataset.id); }; });
+}
+
+function closeModal(){ $('modal').classList.remove('on'); }
+$('modal').onclick = function(e){ if (e.target === $('modal')) closeModal(); };
+function openModal(html){ $('panel').innerHTML = html; $('modal').classList.add('on'); }
+
+function openDemande(id){
+  api('GET','/demandes/' + id).then(function(r){
+    var d = r.demande, ctx = d.contexte;
+    var h = '<div class="bar"><h2 style="flex:1">' + esc(d.reference) + ' — ' + esc(d.entreprise) + '</h2><button class="b ghost sm" id="mClose">Fermer</button></div>';
+    h += '<div class="grid2"><div class="kv"><i>Responsable</i>' + esc(d.responsable) + '</div><div class="kv"><i>Email</i>' + (d.email ? '<a href="mailto:' + esc(d.email) + '">' + esc(d.email) + '</a>' : '—') + '</div>' +
+      '<div class="kv"><i>Téléphone</i>' + (esc(d.telephone) || '—') + '</div><div class="kv"><i>Reçue le (Abidjan)</i>' + fmt(d.created_at) + '</div>' +
+      '<div class="kv"><i>Besoin</i>' + esc(d.besoin) + '</div><div class="kv"><i>Montant souhaité</i>' + (esc(d.montant) || '—') + '</div>' +
+      '<div class="kv"><i>Disponibilités indiquées</i>' + esc(d.disponibilites || '—') + '</div><div class="kv"><i>Origine</i>' + esc(d.source) + '</div></div>';
+    if (d.description) h += '<div class="kv"><i>Description</i>' + esc(d.description) + '</div>';
+    if (ctx) h += '<div class="kv"><i>Contexte transmis depuis l\'outil</i>' + esc(JSON.stringify(ctx)) + '</div>';
+    if (d.relances_ok === 0) h += '<div class="warn">Ce client s\'est désinscrit des emails de relance.</div>';
+
+    h += '<h3>Suivi</h3><div class="grid2"><div><label>Statut</label><select id="mSt">' + STAT.map(function(s){ return '<option value="' + s + '"' + (s === d.statut ? ' selected' : '') + '>' + esc(STAT_LAB[s]) + '</option>'; }).join('') + '</select></div>' +
+      '<div><label>Conseiller</label><input id="mAs" value="' + esc(d.assigne_a || '') + '" placeholder="Nom du conseiller"></div></div>' +
+      '<label>Motif (si sans suite)</label><input id="mMo" style="width:100%" value="' + esc(d.motif_sans_suite || '') + '">' +
+      '<label>Notes internes</label><textarea id="mNo">' + esc(d.notes || '') + '</textarea>' +
+      '<div class="bar" style="margin-top:8px"><button class="b gold" id="mSave">Enregistrer</button></div>';
+
+    h += '<h3>Rendez-vous</h3>';
+    if (r.rdvs.length) h += '<table><tr><th>Date (Abidjan)</th><th>Durée</th><th>Statut</th><th>Lien</th><th></th></tr>' + r.rdvs.map(function(v){
+      return '<tr><td>' + fmt(v.debut) + '</td><td>' + v.duree_min + ' min</td><td>' + esc(v.statut) + '</td><td>' + (v.lien_meet ? '<a target="_blank" rel="noopener" href="' + esc(v.lien_meet) + '">Meet</a>' : '<span class="tag late">à ajouter</span>') + '</td><td>' +
+        (v.statut === 'planifie' ? '<button class="b sm ghost" data-rd="realise" data-id="' + v.id + '">Réalisé</button> <button class="b sm ghost" data-rd="absent" data-id="' + v.id + '">Absent</button> <button class="b sm red" data-rd="annule" data-id="' + v.id + '">Annuler</button>' : '') + '</td></tr>';
+    }).join('') + '</table>';
+    else h += '<p class="note">Aucun rendez-vous.</p>';
+    var gOk = r.google;
+    h += '<div style="margin-top:10px;border:1px solid var(--line);padding:12px"><b>Planifier un appel</b><div class="grid2"><div><label>Date et heure (Abidjan)</label><input type="datetime-local" id="rdDeb"></div><div><label>Durée (min)</label><input type="number" id="rdDur" value="30" min="10" max="240"></div></div>' +
+      '<label><input type="checkbox" id="rdG"> Créer le lien Google Meet et envoyer l\'invitation par Google Agenda (nécessite la connexion Google)</label>' +
+      '<label>Ou lien Meet à saisir à la main</label><input id="rdL" style="width:100%" placeholder="https://meet.google.com/…"><div class="bar" style="margin-top:8px"><button class="b gold" id="rdGo">Planifier le rendez-vous</button></div>' +
+      '<p class="note">Des rappels au client (veille et 1 h avant) et un rappel interne (15 min avant) sont programmés automatiquement.</p></div>';
+
+    h += '<h3>Relances</h3>';
+    if (r.relances.length) h += '<table><tr><th>Échéance</th><th>Type</th><th>Titre</th><th>Statut</th></tr>' + r.relances.map(function(x){
+      return '<tr><td>' + fmt(x.due_at) + '</td><td>' + (x.type === 'email' ? 'Email client' : 'Tâche interne') + '</td><td>' + esc(x.titre) + '</td><td>' + sl(x.statut) + (x.erreur ? ' — ' + esc(x.erreur) : '') + '</td></tr>';
+    }).join('') + '</table>'; else h += '<p class="note">Aucune relance.</p>';
+    h += '<div style="margin-top:10px;border:1px solid var(--line);padding:12px"><b>Programmer une relance</b><div class="grid2"><div><label>Type</label><select id="rlT"><option value="interne">Tâche interne (m\'appeler / rappeler)</option><option value="email">Email au client</option></select></div><div><label>Échéance (Abidjan)</label><input type="datetime-local" id="rlD"></div></div>' +
+      '<label>Titre</label><input id="rlTi" style="width:100%" placeholder="Ex. Rappeler pour la proposition"><div id="rlMW" hidden><label>Message envoyé au client</label><textarea id="rlM"></textarea></div>' +
+      '<div class="bar" style="margin-top:8px"><button class="b" id="rlGo">Programmer</button></div></div>';
+
+    h += '<h3>Parcours sur la plateforme</h3>';
+    if (!r.compte) h += '<p class="note">Aucun compte TAPA DOC avec cet email : pas de parcours à afficher.</p>';
+    else {
+      h += '<p class="note">Compte créé le ' + fmt(r.compte.created_at) + (r.compte.has_paid_before ? ' — a déjà payé' : ' — n\'a pas encore payé') + '.</p>';
+      h += r.parcours.length ? '<div class="timeline">' + r.parcours.map(function(p){ return '<div><small>' + fmt(p.created_at) + '</small> ' + esc(p.produit) + ' · ' + esc(p.type) + (p.detail ? ' · ' + esc(p.detail) : '') + '</div>'; }).join('') + '</div>' : '<p class="note">Aucune action enregistrée pour le moment.</p>';
+    }
+    openModal(h);
+
+    $('mClose').onclick = closeModal;
+    $('rlT').onchange = function(){ $('rlMW').hidden = this.value !== 'email'; };
+    $('mSave').onclick = function(){ api('PATCH','/demandes/' + id, { statut: $('mSt').value, notes: $('mNo').value, motif_sans_suite: $('mMo').value, assigne_a: $('mAs').value }).then(function(){ toast('Enregistré.'); openDemande(id); refreshDem(); }).catch(fail); };
+    $('rdGo').onclick = function(){
+      if (!$('rdDeb').value) return toast('Choisissez la date et l\'heure.', true);
+      api('POST','/demandes/' + id + '/rdv', { debut: $('rdDeb').value, duree_min: $('rdDur').value, google: $('rdG').checked, lien_meet: $('rdL').value }).then(function(x){ toast(x.avertissement || 'Rendez-vous planifié.', !!x.avertissement); openDemande(id); refreshDem(); }).catch(fail);
+    };
+    Array.prototype.forEach.call($('panel').querySelectorAll('[data-rd]'), function(b){ b.onclick = function(){
+      if (b.dataset.rd === 'annule' && !confirm('Annuler ce rendez-vous ? Les rappels seront supprimés.')) return;
+      api('PATCH','/rdv/' + b.dataset.id, { statut: b.dataset.rd }).then(function(x){ toast(x.avertissement || 'Mis à jour.', !!x.avertissement); openDemande(id); refreshDem(); }).catch(fail);
+    }; });
+    $('rlGo').onclick = function(){
+      if (!$('rlD').value) return toast('Choisissez l\'échéance.', true);
+      api('POST','/relances', { demande_id: id, type: $('rlT').value, titre: $('rlTi').value, message: $('rlM').value, due_at: $('rlD').value }).then(function(){ toast('Relance programmée.'); openDemande(id); }).catch(fail);
+    };
+  }).catch(fail);
+}
+function refreshDem(){ if (TAB === 'demandes') vDemandes().catch(fail); }
+
+/* ---------- rendez-vous ---------- */
+var RPER = 'a_venir';
+function vRdv(){
+  return api('GET','/rdv?periode=' + RPER).then(function(r){
+    var h = '<h2>Rendez-vous</h2><div class="bar"><select id="rp"><option value="a_venir">À venir</option><option value="passes">Passés / clos</option><option value="tous">Tous</option></select></div>';
+    h += r.rdvs.length ? '<table><tr><th>Date (Abidjan)</th><th>Client</th><th>Statut</th><th>Lien</th><th></th></tr>' + r.rdvs.map(function(v){
+      return '<tr><td>' + fmt(v.debut) + ' <small>(' + v.duree_min + ' min)</small></td><td><b>' + esc(v.entreprise) + '</b><br>' + esc(v.responsable) + '<br><small>' + esc(v.reference) + '</small></td><td>' + esc(v.statut) + '</td><td>' + (v.lien_meet ? '<a target="_blank" rel="noopener" href="' + esc(v.lien_meet) + '">Rejoindre</a>' : '<span class="tag late">lien manquant</span>') + '</td><td><button class="b sm ghost" data-d="' + v.demande_id + '">Ouvrir le dossier</button></td></tr>';
+    }).join('') + '</table>' : '<div class="empty">Aucun rendez-vous.</div>';
+    $('view').innerHTML = h; $('rp').value = RPER; $('rp').onchange = function(){ RPER = this.value; vRdv().catch(fail); };
+    Array.prototype.forEach.call($('view').querySelectorAll('[data-d]'), function(b){ b.onclick = function(){ api('GET','/overview').then(function(o){ STAT_LAB = o.statutLabels; STAT = Object.keys(o.parStatut); openDemande(b.dataset.d); }); }; });
+  });
+}
+
+/* ---------- relances ---------- */
+var RFIL = 'a_faire';
+function vRelances(){
+  return api('GET','/relances?filtre=' + RFIL).then(function(r){
+    var h = '<h2>Relances</h2><div class="bar"><select id="rf"><option value="a_faire">À faire</option><option value="retard">En retard</option><option value="aujourdhui">Aujourd\'hui et en retard</option><option value="terminees">Terminées / annulées / en échec</option></select></div>';
+    h += r.relances.length ? '<table><tr><th>Échéance</th><th>Pour</th><th>Type</th><th>Titre</th><th>Statut</th><th></th></tr>' + r.relances.map(function(x){
+      var qui = x.entreprise ? '<b>' + esc(x.entreprise) + '</b><br>' + esc(x.responsable || '') : (x.user_entreprise ? '<b>' + esc(x.user_entreprise) + '</b><br>' + esc(x.user_email || '') : '—');
+      var act = '';
+      if (x.statut === 'a_faire') act = (x.type === 'interne' ? '<button class="b sm" data-a="fait" data-id="' + x.id + '">Fait</button> ' : '') + '<button class="b sm ghost" data-a="annulee" data-id="' + x.id + '">Annuler</button>';
+      else if (x.statut === 'echec') act = '<button class="b sm" data-a="a_faire" data-id="' + x.id + '">Renvoyer</button>';
+      return '<tr><td>' + fmt(x.due_at) + (x.enRetard ? '<br><span class="tag late">en retard</span>' : '') + '</td><td>' + qui + '</td><td>' + (x.type === 'email' ? 'Email client' : 'Tâche interne') + (x.auto ? '<br><small>automatique</small>' : '') + '</td><td>' + esc(x.titre) + '</td><td>' + sl(x.statut) + (x.erreur ? '<br><small>' + esc(x.erreur) + '</small>' : '') + '</td><td>' + act + '</td></tr>';
+    }).join('') + '</table>' : '<div class="empty">Rien à afficher.</div>';
+    $('view').innerHTML = h; $('rf').value = RFIL; $('rf').onchange = function(){ RFIL = this.value; vRelances().catch(fail); };
+    Array.prototype.forEach.call($('view').querySelectorAll('[data-a]'), function(b){ b.onclick = function(){
+      var body = { statut: b.dataset.a }; if (b.dataset.a === 'a_faire') body.due_at = new Date().toISOString().slice(0,19).replace('T',' ');
+      api('PATCH','/relances/' + b.dataset.id, body).then(function(){ vRelances().catch(fail); }).catch(fail);
+    }; });
+  });
+}
+
+/* ---------- parcours ---------- */
+var PFIL = '';
+function vParcours(){
+  return Promise.all([api('GET','/parcours'), api('GET','/parcours/personnes' + (PFIL ? '?produit=' + PFIL : ''))]).then(function(rs){
+    var p = rs[0], pers = rs[1].personnes;
+    var h = '<h2>Parcours par service</h2><p class="note">Suivi des personnes identifiées (compte créé) uniquement. Les visiteurs anonymes ne sont pas suivis.</p>';
+    h += '<div class="cards"><div class="card"><b>' + p.comptes + '</b><small>Comptes créés</small></div><div class="card"><b>' + p.verifies + '</b><small>Emails vérifiés</small></div><div class="card"><b>' + p.preCred.demandes + '</b><small>Demandes PRE-CRED</small></div><div class="card"><b>' + p.preCred.rdvPlanifie + '</b><small>avec rendez-vous</small></div><div class="card"><b>' + p.preCred.clientsConfirmes + '</b><small>clients confirmés</small></div></div>';
+    p.services.forEach(function(s){
+      var max = Math.max(1, s.ouvert);
+      var row = function(l, n){ return '<div class="row"><span class="lab">' + l + '</span><span class="fill" style="width:' + Math.round(n / max * 300) + 'px"></span><b>' + n + '</b></div>'; };
+      h += '<h3>' + esc(s.label) + '</h3><div class="funnel">' + row('Ont ouvert l\'outil', s.ouvert) + row('Ont vu la page de paiement', s.paywall) + row('Ont cliqué sur Payer', s.clic) + row('Ont payé', s.payes) + '</div>';
+      if (s.arrets.length) h += '<p class="note">Où ils se sont arrêtés : ' + s.arrets.map(function(a){ return esc(a.etape) + ' (' + a.n + ')'; }).join(' · ') + '</p>';
+    });
+    h += '<h3>Personnes</h3><div class="bar"><select id="pf"><option value="">Tous les services</option><option value="finmodel">TAPA FinModel</option><option value="business-plan">Business Plan</option><option value="procedures">TAPA Procédures</option></select></div>';
+    h += pers.length ? '<table><tr><th>Personne</th><th>Inscrit le</th><th>État par service</th><th>PRE-CRED</th></tr>' + pers.map(function(u){
+      return '<tr><td><b>' + esc(u.entreprise || '—') + '</b><br>' + esc(u.email) + (u.telephone ? '<br>' + esc(u.telephone) : '') + '</td><td>' + fmt(u.creeLe) + (u.verifie ? '' : '<br><span class="tag">email non vérifié</span>') + '</td><td>' + u.lignes.filter(function(l){ return l.ouvert || l.paye; }).map(function(l){ return '<div><b>' + esc(l.label) + '</b> : ' + esc(l.etat) + (l.dernier ? ' <small>(' + fmt(l.dernier) + ')</small>' : '') + '</div>'; }).join('') + '</td><td>' + (u.demandeId ? '<button class="b sm ghost" data-d="' + u.demandeId + '">PC-' + String(u.demandeId).padStart(4,'0') + '</button> ' + tag(u.demandeStatut) : '—') + '</td></tr>';
+    }).join('') + '</table>' : '<div class="empty">Aucune personne à afficher.</div>';
+    $('view').innerHTML = h; $('pf').value = PFIL; $('pf').onchange = function(){ PFIL = this.value; vParcours().catch(fail); };
+    Array.prototype.forEach.call($('view').querySelectorAll('[data-d]'), function(b){ b.onclick = function(){ api('GET','/overview').then(function(o){ STAT_LAB = o.statutLabels; STAT = Object.keys(o.parStatut); openDemande(b.dataset.d); }); }; });
+  });
+}
+
+/* ---------- Google ---------- */
+function vGoogle(){
+  return api('GET','/google/status').then(function(g){
+    var h = '<h2>Google Agenda</h2>';
+    if (g.connected) h += '<div class="warn" style="background:#e5f4e6;border-color:#9ccc9f"><b class="ok">Connecté</b> — agenda : ' + esc(g.email || '') + '. Chaque rendez-vous planifié avec « Google Meet » crée un évènement avec lien Meet et envoie l\'invitation au client.</div><button class="b red" id="gOff">Déconnecter</button>';
+    else if (!g.configured) h += '<div class="warn"><b>Pas encore configuré.</b> Ajoutez <code>GOOGLE_CLIENT_ID</code> et <code>GOOGLE_CLIENT_SECRET</code> dans les variables Railway (suivez le guide fourni), puis revenez ici. En attendant, vous pouvez saisir à la main le lien Meet de chaque rendez-vous.</div>';
+    else h += '<p>Les identifiants Google sont configurés. Cliquez pour autoriser l\'accès à l\'agenda de l\'équipe.</p><button class="b gold" id="gOn">Connecter Google Agenda</button>';
+    $('view').innerHTML = h;
+    var on = $('gOn'); if (on) on.onclick = function(){ api('POST','/google/connect').then(function(x){ location.href = x.url; }).catch(fail); };
+    var off = $('gOff'); if (off) off.onclick = function(){ if (confirm('Déconnecter Google Agenda ?')) api('POST','/google/disconnect').then(function(){ vGoogle().catch(fail); }).catch(fail); };
+  });
+}
+
+if (KEY) { fetch(API + '/api/bo/overview', { headers: { 'x-admin-key': KEY } }).then(function(r){ if (r.ok) return r.json().then(function(j){ STAT_LAB = j.statutLabels; enter(); }); $('login').hidden = false; }).catch(function(){ $('login').hidden = false; }); }
+else $('login').hidden = false;
+})();
+</script>
+</body>
+</html>
